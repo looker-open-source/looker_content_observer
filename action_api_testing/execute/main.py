@@ -56,6 +56,3 @@ def action_execute(request):
     except Exception as e:
         print(e.message)
     return f"{response.__dict__}"
-
-
-    return f"{request}"
