@@ -1,6 +1,7 @@
 import functions_framework
 import base64
 import zipfile 
+import os
 import pandas as pd
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
