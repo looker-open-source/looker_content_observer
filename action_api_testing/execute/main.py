@@ -21,9 +21,9 @@ def action_execute(request):
     decoded_file = base64.b64decode(data)
     zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
 
-    with pd.ExcelWriter('test_output.xlsx') as writer:  
+    with pd.ExcelWriter('/tmp/test_output.xlsx') as writer:  
         for file in zf.namelist():
-            df = pd.read_csv(zf.open(file))
+            df = pd.read_csv(zf.open(file))  
             sheet_name = file.split("/")[1].split(".")[0] # Example of file:  'dashboard-zocdoc_jhu_covid/filters_applied.csv'
             print(sheet_name)
             df.to_excel(writer, sheet_name=sheet_name,index=False)
