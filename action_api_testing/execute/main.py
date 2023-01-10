@@ -48,6 +48,7 @@ def action_execute(request):
     )
     message.attachment = attachedFile
     try:
+        print("Check for environment variable",os.environ.get('SENDGRID_API_KEY'))
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
         print(response.status_code)
