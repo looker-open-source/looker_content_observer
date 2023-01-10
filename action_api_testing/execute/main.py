@@ -9,21 +9,20 @@ import io
 
 @functions_framework.http
 def action_execute(request):
+    """
+    Combines zipped CSV file into singel Excel File, emails Excel File to receipient
+    """
     request = request.get_json()
-    print(' :', request)
+    print('Request Payload:', request)
 
-    title = request['scheduled_plan']['title']
-    title = title.replace(" ", "_").lower()
-
+    #  Retrieve Form Information: Email + File Name
     email = request['form_params']['email_address']
     file_name = request['form_params']['excel_file_name'] + ".xlsx"
-    print("Email receipient", email)
-    print("Name of file:",file_name)
 
     data = request['attachment']['data']
     decoded_file = base64.b64decode(data)
     zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
-    print("List of files:",zf.namelist())
+    print("List of files from dashboard:",zf.namelist())
 
     with pd.ExcelWriter(f'/tmp/{file_name}') as writer:  
         for file in zf.namelist():
@@ -32,8 +31,7 @@ def action_execute(request):
             print(sheet_name)
             df.to_excel(writer, sheet_name=sheet_name,index=False)
 
-    message = Mail(
-                    from_email=email,
+    message = Mail( from_email=email,
                     to_emails=email,
                     subject='Testing Sending Email from Action Hub',
                     html_content='<strong>Fingers Crossed!</strong>')
@@ -41,7 +39,7 @@ def action_execute(request):
     with open(f'/tmp/{file_name}', 'rb') as f:
         data = f.read()
     encoded_file = base64.b64encode(data).decode()
-    # encoded_file = base64.b64encode('/tmp/test_output.xlsx').decode()
+
     attachedFile = Attachment(
         FileContent(encoded_file),
         FileName(file_name),
