@@ -1,5 +1,4 @@
 functions-framework==3.*
 pandas
-base64
 zipfile
 sendgrid
