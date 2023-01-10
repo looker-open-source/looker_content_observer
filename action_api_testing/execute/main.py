@@ -16,15 +16,16 @@ def action_execute(request):
     title = title.replace(" ", "_").lower()
 
     email = request['form_params']['email_address']
-    file_name = request['form_params']['excel_file_name']
+    file_name = request['form_params']['excel_file_name'] + ".xlsx"
     print("Email receipient", email)
+    print("Name of file:",file_name)
 
     data = request['attachment']['data']
     decoded_file = base64.b64decode(data)
     zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
     print("List of files:",zf.namelist())
 
-    with pd.ExcelWriter(f'/tmp/{file_name}.xlsx') as writer:  
+    with pd.ExcelWriter(f'/tmp/{file_name}') as writer:  
         for file in zf.namelist():
             df = pd.read_csv(zf.open(file))  
             sheet_name = file.split("/")[1].split(".")[0] # Example of file:  'dashboard-zocdoc_jhu_covid/filters_applied.csv'
@@ -37,18 +38,19 @@ def action_execute(request):
                     subject='Testing Sending Email from Action Hub',
                     html_content='<strong>Fingers Crossed!</strong>')
     
-    with open(f'/tmp/{file_name}.xlsx', 'rb') as f:
+    with open(f'/tmp/{file_name}', 'rb') as f:
         data = f.read()
     encoded_file = base64.b64encode(data).decode()
     # encoded_file = base64.b64encode('/tmp/test_output.xlsx').decode()
     attachedFile = Attachment(
         FileContent(encoded_file),
-        FileName(f'{file_name}.xlsx'),
+        FileName(file_name),
         FileType('application/xls'),
         Disposition('attachment')
     )
     message.attachment = attachedFile
     try:
+        print('SENDGRID auth',os.environ.get('SENDGRID_API_KEY'))
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
         print(response.status_code)
