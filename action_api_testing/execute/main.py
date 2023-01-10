@@ -4,6 +4,7 @@ import zipfile
 import pandas as pd
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
+import io
 
 @functions_framework.http
 def action_execute(request):
@@ -18,7 +19,7 @@ def action_execute(request):
 
     data = request['attachment']['data']
     decoded_file = base64.b64decode(data)
-    zf = zipfile.ZipFile(decoded_file) 
+    zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
 
     with pd.ExcelWriter('test_output.xlsx') as writer:  
         for file in zf.namelist():
