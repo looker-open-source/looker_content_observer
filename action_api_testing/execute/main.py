@@ -20,6 +20,7 @@ def action_execute(request):
     data = request['attachment']['data']
     decoded_file = base64.b64decode(data)
     zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
+    print("List of files:",zf.namelist())
 
     with pd.ExcelWriter('/tmp/test_output.xlsx') as writer:  
         for file in zf.namelist():
@@ -33,7 +34,11 @@ def action_execute(request):
                     to_emails=email,
                     subject='Testing Sending Email from Action Hub',
                     html_content='<strong>Fingers Crossed!</strong>')
-    encoded_file = base64.b64encode(writer).decode()
+    
+    with open('/tmp/test_output.xlsx', 'rb') as f:
+        data = f.read()
+    encoded_file = base64.b64encode(data).decode()
+    # encoded_file = base64.b64encode('/tmp/test_output.xlsx').decode()
     attachedFile = Attachment(
         FileContent(encoded_file),
         FileName('test_output.xlsx'),
