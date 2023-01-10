@@ -8,9 +8,9 @@ def action_list(request):
     actions_list = {
       "integrations": [
         {
-          "name": "test_excel_2",
-          "label": "Test 2 as Folders",
-          "description": "Download a dashboard as a tabbed Excel file",
+          "name": "test_excel",
+          "label": "Email Combined CSV as Single Excel File",
+          "description": "Combines a Looker dashboards tiles into a single Excel, each sheet maps to one tile.",
           "form_url": "https://us-central1-ryancustomerhosted.cloudfunctions.net/forms" ,
           "url": "https://us-central1-ryancustomerhosted.cloudfunctions.net/post_execution",
           "supported_action_types": ["dashboard"],
