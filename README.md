@@ -1,10 +1,10 @@
 # cloud_testing
 Contains Following Repos:
 - action_api_testing repo: Looker Action API + Cloud Functions to club together csv's into a single Excel file
-
+- scratchwork: Repo for scratchwork and testing code. Ignore.
 ## Repo: action_api_testing
 ### Overview
-Repo uses the Looker Action API to create a custom [Action](https://developers.looker.com/actions/overview/) within Looker. This action uses [GCP's Cloud Function](https://cloud.google.com/functions) to transform the combined csv zip file into a single Excel (each csv becomes a new named sheet within the Excel) and then uses the [Sendgrid API](https://sendgrid.com/solutions/email-api/) to email the newly created  Excel file to a recipient. 
+Repo uses the Looker Action API to create a custom [Action](https://developers.looker.com/actions/overview/) within Looker. This action uses [GCP's Cloud Function](https://cloud.google.com/functions) to transform the combined csv zip file into a single Excel (each csv becomes a new named sheet within the Excel) and then uses a [GMAIL SMTP](https://pypi.org/project/yagmail/) to email the newly created  Excel file to a recipient. 
 
 ### Functions
   - **list**: Entry point, informs Looker there is a custom action to perform
@@ -19,16 +19,20 @@ For example, I have a Dashboard with 3 tiles (New Users by Signup Date, User Dem
 I can use the *Schedule Delivery* to trigger the custom Action, called **"Email Combined CSV as Single Excel File"** and asks users to input in an e-mail address as well as a name for the Excel File. 
 ![Schedule Action](/action_api_testing/action_screenshots/action_example_1.png)
 
-Users will then get an email with an Single Excel FIle where the elements of the dashboard / tiles get turned into Excel sheets within the same file: 
-![Schedule Action](/action_api_testing/action_screenshots/action_example_2.png)
+Users will then get an email with an Single Excel FIle:
+![Sample Email](/action_api_testing/action_screenshots/action_example_2.png)
+**Note**: I am using the gmail SMTP but any SMTP service can be used. 
 
+Each sheet of the Excel File will map to a tile from the dashboard: 
+![Downloaded Excel File](/action_api_testing/action_screenshots/action_example_4.png)
+**Note**: The function uses an excel template to add formatting and appends the data component below the formatting.
 
-### Notes/Further Features
+### Further Features
 **On modifying the Excel File**: 
 By modifying the **execute** function, we can modify the process of creating the Excel file to add custom headers/formatting as needed either by coding the modification into the function and/or pulling a template from a GCS Cloud Storage Bucket and inserting in the data to that template.  
 
-**On the Sendgrid API**: 
-Another other SMTP service can be used. Sendgrid was used purely for testing purposes, you can swap in a gmail and/or Outlook account just as easily. 
+**On the SMTP**: 
+Another other SMTP service can be used. Sendgrid and yagmail were used for testing purposes, you can swap in an Outlook account just as easily. 
 
 
 ## Docs/Resources
@@ -40,3 +44,10 @@ General Docs:
 
 Helpful Articles:
 - [Writing files in Cloud Function](https://medium.com/@hpoleselo/writing-files-within-a-cloud-function-tmp-to-the-rescue-a47a6b482758)
+- [Using openpyxl to read an excel file](https://stackoverflow.com/questions/69684388/django-open-excel-xlsx-with-openpyxl-from-google-cloud-storage)
+
+
+## Repo: action_api_testing
+
+### Overview
+Repo contains scratchwork code for various tests. Code is not in managed state and should be ignored.
