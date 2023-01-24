@@ -3,8 +3,7 @@ import base64
 import zipfile 
 import os
 import pandas as pd
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
+import yagmail
 from google.cloud import storage
 import io
 
@@ -25,9 +24,11 @@ def action_execute(request):
     zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
     print("List of files from dashboard:",zf.namelist())
 
+    # Retrieve the 
     storage_client = storage.Client()
     bucket = storage_client.bucket("lookeraction_cloudfunction")
-    print("The bucket object data is:",type(bucket),bucket.__dict__)
+    for blob in bucket.list_blobs():
+        print("Name of blob in gcp bucket:",blob.name)
 
     with pd.ExcelWriter(f'/tmp/{file_name}') as writer:  
         for file in zf.namelist():
@@ -36,28 +37,16 @@ def action_execute(request):
             print(sheet_name)
             df.to_excel(writer, sheet_name=sheet_name,index=False)
 
-    message = Mail( from_email=email,
-                    to_emails=email,
-                    subject='Testing Sending Email from Action Hub',
-                    html_content='<strong>Fingers Crossed!</strong>')
-    
-    with open(f'/tmp/{file_name}', 'rb') as f:
-        data = f.read()
-    encoded_file = base64.b64encode(data).decode()
-
-    attachedFile = Attachment(
-        FileContent(encoded_file),
-        FileName(file_name),
-        FileType('application/xls'),
-        Disposition('attachment')
-    )
-    message.attachment = attachedFile
     try:
-        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-    except Exception as e:
-        print(e.message)
-    return f"{response.__dict__}"
+        user_email = os.environ.get('user_email')
+        password = os.environ.get('gmail_password')
+        yag = yagmail.SMTP(user=user_email,
+                        password=password)
+        contents = [
+            "Please Find Single Excel File Excel Report which Combines a CSV Zip File"
+        ]
+        yag.send(email, 'Looker Action API Triggered Email', contents, attachments=f'/tmp/{file_name}')
+    except:
+        print("Error Sending Email")
+
+    return f"{request.__dict__}"
