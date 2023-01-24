@@ -1,3 +1,4 @@
+**Copyright 2023 Google. This software is provided as-is, without warranty or representation for any use or purpose. Your use of it is subject to your agreement with Google.** 
 # cloud_testing
 **Contains Following Repos**:
 - **action_api_testing repo**: Looker Action API + Cloud Functions to club together csv's into a single Excel file
