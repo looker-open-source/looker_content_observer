@@ -1,5 +1,10 @@
 import yagmail
 import os
+
+"""
+Scratchwork: Code to test the yagmail SMTP
+"""
+
 user_email = os.environ.get('user_email')
 password = os.environ.get('gmail_password')
 

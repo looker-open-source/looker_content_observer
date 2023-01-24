@@ -3,3 +3,4 @@ pandas
 yagmail
 xlsxwriter
 google-cloud-storage
+openpyxl
