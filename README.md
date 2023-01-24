@@ -1,8 +1,9 @@
 # cloud_testing
-Contains Following Repos:
-- action_api_testing repo: Looker Action API + Cloud Functions to club together csv's into a single Excel file
-- scratchwork: Repo for scratchwork and testing code. Ignore.
-## Repo: action_api_testing
+**Contains Following Repos**:
+- **action_api_testing repo**: Looker Action API + Cloud Functions to club together csv's into a single Excel file
+- **scratchwork**: Repo for scratchwork and testing code.
+
+## **Repo: action_api_testing**
 ### Overview
 Repo uses the Looker Action API to create a custom [Action](https://developers.looker.com/actions/overview/) within Looker. This action uses [GCP's Cloud Function](https://cloud.google.com/functions) to transform the combined csv zip file into a single Excel (each csv becomes a new named sheet within the Excel) and then uses a [GMAIL SMTP](https://pypi.org/project/yagmail/) to email the newly created  Excel file to a recipient. 
 
@@ -15,11 +16,10 @@ Repo uses the Looker Action API to create a custom [Action](https://developers.l
 For example, I have a Dashboard with 3 tiles (New Users by Signup Date, User Demo - Age, and Product Data):
 ![Sample Dashboard](/action_api_testing/action_screenshots/action_example_3.png)
 
-
 I can use the *Schedule Delivery* to trigger the custom Action, called **"Email Combined CSV as Single Excel File"** and asks users to input in an e-mail address as well as a name for the Excel File. 
 ![Schedule Action](/action_api_testing/action_screenshots/action_example_1.png)
 
-Users will then get an email with an Single Excel FIle:
+Users will then get an email with a single excel file whose name is defined by the inputs from the "Name of Excel File" form defined within Looker:
 ![Sample Email](/action_api_testing/action_screenshots/action_example_2.png)
 **Note**: I am using the gmail SMTP but any SMTP service can be used. 
 
@@ -33,7 +33,6 @@ By modifying the **execute** function, we can modify the process of creating the
 
 **On the SMTP**: 
 Another other SMTP service can be used. Sendgrid and yagmail were used for testing purposes, you can swap in an Outlook account just as easily. 
-
 
 ## Docs/Resources
 General Docs:

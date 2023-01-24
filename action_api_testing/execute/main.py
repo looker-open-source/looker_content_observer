@@ -9,6 +9,9 @@ import io
 import openpyxl
 
 def load_excel_file(file_loc,list_of_vals, sheet_name):
+    """
+    Function writes and saves data into the excel file which will be emailed
+    """
     wb = openpyxl.load_workbook(file_loc)
     ws = wb[sheet_name]
     for row_data in list_of_vals:
@@ -50,13 +53,14 @@ def action_execute(request):
         list_of_vals = df.values.tolist()
         load_excel_file(template_file_loc,list_of_vals,sheet_name)
 
-    # with pd.ExcelWriter(f'/tmp/{file_name}') as writer:  
-    #     for file in zf.namelist():
-    #         df = pd.read_csv(zf.open(file))  
-    #         sheet_name = file.split("/")[1].split(".")[0] # Example of file:  'dashboard-zocdoc_jhu_covid/filters_applied.csv'
-    #         print(sheet_name)
-    #         df.to_excel(writer, sheet_name=sheet_name,index=False)
-
+    # Code Below can be used if formatting is not needed
+    """
+    with pd.ExcelWriter(f'/tmp/{file_name}') as writer:  
+        for file in zf.namelist():
+            df = pd.read_csv(zf.open(file))  
+            sheet_name = file.split("/")[1].split(".")[0] # Example of file:  'dashboard-zocdoc_jhu_covid/filters_applied.csv'
+            df.to_excel(writer, sheet_name=sheet_name,index=False)
+    """
     try:
         user_email = os.environ.get('user_email')
         password = os.environ.get('gmail_password')
