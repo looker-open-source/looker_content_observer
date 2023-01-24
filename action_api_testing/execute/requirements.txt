@@ -1,4 +1,5 @@
 functions-framework==3.*
 pandas
 sendgrid
-xlsxwriter  
+xlsxwriter
+google-cloud-storage

@@ -5,6 +5,7 @@ import os
 import pandas as pd
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (Mail, Attachment, FileContent, FileName, FileType, Disposition)
+from google.cloud import storage
 import io
 
 @functions_framework.http
@@ -23,6 +24,10 @@ def action_execute(request):
     decoded_file = base64.b64decode(data)
     zf = zipfile.ZipFile(io.BytesIO(decoded_file), "r")
     print("List of files from dashboard:",zf.namelist())
+
+    storage_client = storage.Client()
+    bucket = storage_client.bucket("lookeraction_cloudfunction")
+    print("The bucket object data is:",type(bucket),bucket.__dict__)
 
     with pd.ExcelWriter(f'/tmp/{file_name}') as writer:  
         for file in zf.namelist():
