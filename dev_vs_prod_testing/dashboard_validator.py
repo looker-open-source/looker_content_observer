@@ -12,8 +12,17 @@ Note:
 
 
 class LookerEnvironment:
-    def __init__(self,environment:str) -> None:
-        self.sdk = looker_sdk.init40()
+    """
+    overview: 
+    - 
+
+    init: 
+    - See init args for sdk: https://github.com/looker-open-source/sdk-codegen/blob/main/python/looker_sdk/__init__.py#L71 
+    """
+    def __init__(self, environment:str, config_file:str=None, config_instance:str = None) -> None:
+        self.config_file = "looker.ini" if config_file is None else config_file
+        self.config_instance = 'Looker' if config_instance is None else config_instance 
+        self.sdk = looker_sdk.init40(self.config_file, section =self.config_instance)
         self.me = self.sdk.me()
         self.environment = environment
 
@@ -26,9 +35,9 @@ class LookerEnvironment:
         :returns: 
          - session object -> Use to confirm the session.workspace_id == desired_environment, i.e production or dev  
         """
-        print(f"Switching to {self.environment}:")
         body = {"workspace_id":self.environment}
         self.sdk.update_session(body=body)
+        print(f"\033[93mSwitched to {self.environment} environment\033[00m")
     
     def checkout_dev_branch(self,project_name:str,branch_name:str) -> None:
         """
@@ -98,20 +107,22 @@ if __name__ == '__main__':
     # Set the branch and project
     dev_branch = 'rr_testing_dev_vs_prod'
     project_name = 'looker_ssh'
+    config_file = "looker.ini"
+    config_section = "VM"
 
     # Instantiate the dev and prod sdks
-    prod = LookerEnvironment('production')
-    dev = LookerEnvironment('dev')
+    prod = LookerEnvironment('production',config_instance='VM')
+    dev = LookerEnvironment('dev',config_instance='VM')
     #Change/Enter the dashboard id in the below: 
     # Example: https://my.looker.com19999/dashboards/4 -> Dashboard('4')
     dashboard = Dashboard('4') # Enter the dashboard number you'd like to test here
 
-    print("Testing Production:")
+    print("\033[95mTesting Production:\033[00m")
     print("First Tile from Production:")
     prod_tile = dashboard.get_all_tiles_data(prod.sdk)
     print(prod_tile[0],'\n')
 
-    print("Testing Development:")
+    print("\033[95mTesting Development:\033[00m")
     # Step 1: Call method to switch to development 
     dev.switch_environment()
     # [Optional]: Output session method to confirm switch was succesful
