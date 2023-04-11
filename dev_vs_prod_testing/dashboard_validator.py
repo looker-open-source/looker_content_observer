@@ -2,6 +2,7 @@ import pandas as pd
 import looker_sdk
 import urllib3
 import time
+import configparser
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
 
 """
@@ -105,10 +106,14 @@ class Dashboard:
 
 if __name__ == '__main__':
     # Set the branch and project
-    dev_branch = 'rr_testing_dev_vs_prod'
-    project_name = 'looker_ssh'
+    config = configparser.ConfigParser()
+    # Turn into argparse
     config_file = "looker.ini"
-    config_section = "VM"
+    config.read(config_file)
+    dev_branch = config['VM']['dev_branch']
+    project_name = config['VM']['project']
+    
+    # config_section = "VM"
 
     # Instantiate the dev and prod sdks
     prod = LookerEnvironment('production',config_instance='VM')
