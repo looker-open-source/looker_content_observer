@@ -99,9 +99,12 @@ class Dashboard:
         tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
         dfs = []
         for tile in tiles_in_dashboard:
-            df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
-            # Apply a sorting to all columns, columns sorted in ascending order
-            dfs.append(self.sort_all_columns(df))
+            try:
+                df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
+                # Apply a sorting to all columns, columns sorted in ascending order
+                dfs.append(self.sort_all_columns(df))
+            except: 
+                print("Error with tile",tile)
         return dfs
 
 if __name__ == '__main__':
@@ -120,7 +123,7 @@ if __name__ == '__main__':
     dev = LookerEnvironment('dev',config_instance='VM')
     #Change/Enter the dashboard id in the below: 
     # Example: https://my.looker.com19999/dashboards/4 -> Dashboard('4')
-    dashboard = Dashboard('4') # Enter the dashboard number you'd like to test here
+    dashboard = Dashboard('2') # Enter the dashboard number you'd like to test here
 
     print("\033[95mTesting Production:\033[00m")
     print("First Tile from Production:")
