@@ -104,8 +104,34 @@ class Dashboard:
                 # Apply a sorting to all columns, columns sorted in ascending order
                 dfs.append(self.sort_all_columns(df))
             except: 
-                print("Error with tile",tile)
+                print("Error with tile element of type:",self.map_tile_metadata_to_type(tile))
         return dfs
+    
+    def map_tile_metadata_to_type(self,tile):
+        if tile.title:
+            if tile.query:
+                return "Tile"
+            else: 
+                return "Tile:Merged Query"
+
+        if tile.rich_content_json:
+            return "TextBox or Button/Link"
+
+        if tile.title_text_as_html:
+            return "Markdown File"
+
+
+def quickstart():
+    prod = LookerEnvironment('production',config_instance='VM')
+    dev = LookerEnvironment('dev',config_instance='VM')
+
+    print("Checking Production Authentication: Seeing if Looker can connect to the instance and outputting the credentials of user:")
+    print(prod.me())
+
+    print("Checking Development Authentication: Seeing if Looker can connect to the instance and outputting the credentials of user:")
+    print(dev.me())
+
+
 
 if __name__ == '__main__':
     # Set the branch and project
@@ -126,7 +152,6 @@ if __name__ == '__main__':
     dashboard = Dashboard('2') # Enter the dashboard number you'd like to test here
 
     print("\033[95mTesting Production:\033[00m")
-    print("First Tile from Production:")
     prod_tile = dashboard.get_all_tiles_data(prod.sdk)
     print(prod_tile[0],'\n')
 
