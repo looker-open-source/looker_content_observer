@@ -99,12 +99,14 @@ class Dashboard:
         tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
         dfs = []
         for tile in tiles_in_dashboard:
-            try:
+            type_of_tile = self.map_tile_metadata_to_type(tile)
+            
+            if type_of_tile == 'Tile':
                 df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
                 # Apply a sorting to all columns, columns sorted in ascending order
                 dfs.append(self.sort_all_columns(df))
-            except: 
-                print("Error with tile element of type:",self.map_tile_metadata_to_type(tile))
+            else:
+                print(f"Skipping: {type_of_tile}")
         return dfs
     
     def map_tile_metadata_to_type(self,tile):
@@ -136,13 +138,13 @@ def quickstart():
 if __name__ == '__main__':
     # Set the branch and project
     config = configparser.ConfigParser()
+    
     # Turn into argparse
     config_file = "looker.ini"
     config.read(config_file)
     dev_branch = config['VM']['dev_branch']
     project_name = config['VM']['project']
     
-    # config_section = "VM"
 
     # Instantiate the dev and prod sdks
     prod = LookerEnvironment('production',config_instance='VM')
@@ -152,9 +154,11 @@ if __name__ == '__main__':
     dashboard = Dashboard('2') # Enter the dashboard number you'd like to test here
 
     print("\033[95mTesting Production:\033[00m")
-    prod_tile = dashboard.get_all_tiles_data(prod.sdk)
-    print(prod_tile[0],'\n')
-
+    print("Looping through all dev tiles for the dashboard:")
+    prod_tiles = dashboard.get_all_tiles_data(prod.sdk)
+    for tile in prod_tiles:
+        print(tile.head())
+    
     print("\033[95mTesting Development:\033[00m")
     # Step 1: Call method to switch to development 
     dev.switch_environment()
@@ -162,6 +166,10 @@ if __name__ == '__main__':
     print(dev.get_session())
     # Step 2: Swap to the dev branch you want to test
     dev.checkout_dev_branch(project_name,dev_branch)
-    print("First Tile from Development:")
-    dev_tile = dashboard.get_all_tiles_data(dev.sdk)
-    print(dev_tile[0])
+    print("Looping through all dev tiles for the dashboard:")
+    dev_tiles = dashboard.get_all_tiles_data(dev.sdk)
+    print("Outputting the first 5 rows from each tile:")
+    for tile in dev_tiles:
+        print(tile.head())
+
+
