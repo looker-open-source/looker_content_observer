@@ -2,6 +2,7 @@ import pandas as pd
 import looker_sdk
 import urllib3
 import time
+import configparser
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
 
 """
@@ -12,8 +13,17 @@ Note:
 
 
 class LookerEnvironment:
-    def __init__(self,environment:str) -> None:
-        self.sdk = looker_sdk.init40()
+    """
+    overview: 
+    - 
+
+    init: 
+    - See init args for sdk: https://github.com/looker-open-source/sdk-codegen/blob/main/python/looker_sdk/__init__.py#L71 
+    """
+    def __init__(self, environment:str, config_file:str=None, config_instance:str = None) -> None:
+        self.config_file = "looker.ini" if config_file is None else config_file
+        self.config_instance = 'Looker' if config_instance is None else config_instance 
+        self.sdk = looker_sdk.init40(self.config_file, section =self.config_instance)
         self.me = self.sdk.me()
         self.environment = environment
 
@@ -26,9 +36,9 @@ class LookerEnvironment:
         :returns: 
          - session object -> Use to confirm the session.workspace_id == desired_environment, i.e production or dev  
         """
-        print(f"Switching to {self.environment}:")
         body = {"workspace_id":self.environment}
         self.sdk.update_session(body=body)
+        print(f"\033[93mSwitched to {self.environment} environment\033[00m")
     
     def checkout_dev_branch(self,project_name:str,branch_name:str) -> None:
         """
@@ -89,35 +99,64 @@ class Dashboard:
         tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
         dfs = []
         for tile in tiles_in_dashboard:
-            df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
-            # Apply a sorting to all columns, columns sorted in ascending order
-            dfs.append(self.sort_all_columns(df))
+            type_of_tile = self.map_tile_metadata_to_type(tile)
+            
+            if type_of_tile == 'Tile':
+                df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
+                # Apply a sorting to all columns, columns sorted in ascending order
+                dfs.append(self.sort_all_columns(df))
+            else:
+                print(f"Skipping: {type_of_tile}")
         return dfs
+    
+    def map_tile_metadata_to_type(self,tile):
+        if tile.title:
+            if tile.query:
+                return "Tile"
+            else: 
+                return "Tile:Merged Query"
+
+        if tile.rich_content_json:
+            return "TextBox or Button/Link"
+
+        if tile.title_text_as_html:
+            return "Markdown File"
 
 if __name__ == '__main__':
     # Set the branch and project
-    dev_branch = 'rr_testing_dev_vs_prod'
-    project_name = 'looker_ssh'
+    config = configparser.ConfigParser()
+    
+    # Turn into argparse
+    config_file = "looker.ini"
+    config.read(config_file)
+    dev_branch = config['VM']['dev_branch']
+    project_name = config['VM']['project']
+    
 
     # Instantiate the dev and prod sdks
-    prod = LookerEnvironment('production')
-    dev = LookerEnvironment('dev')
+    prod = LookerEnvironment('production',config_instance='VM')
+    dev = LookerEnvironment('dev',config_instance='VM')
     #Change/Enter the dashboard id in the below: 
     # Example: https://my.looker.com19999/dashboards/4 -> Dashboard('4')
-    dashboard = Dashboard('4') # Enter the dashboard number you'd like to test here
+    dashboard = Dashboard('2') # Enter the dashboard number you'd like to test here
 
-    print("Testing Production:")
-    print("First Tile from Production:")
-    prod_tile = dashboard.get_all_tiles_data(prod.sdk)
-    print(prod_tile[0],'\n')
-
-    print("Testing Development:")
+    print("\033[95mTesting Production:\033[00m")
+    print("Looping through all dev tiles for the dashboard:")
+    prod_tiles = dashboard.get_all_tiles_data(prod.sdk)
+    for tile in prod_tiles:
+        print(tile.head())
+    
+    print("\033[95mTesting Development:\033[00m")
     # Step 1: Call method to switch to development 
     dev.switch_environment()
     # [Optional]: Output session method to confirm switch was succesful
     print(dev.get_session())
     # Step 2: Swap to the dev branch you want to test
     dev.checkout_dev_branch(project_name,dev_branch)
-    print("First Tile from Development:")
-    dev_tile = dashboard.get_all_tiles_data(dev.sdk)
-    print(dev_tile[0])
+    print("Looping through all dev tiles for the dashboard:")
+    dev_tiles = dashboard.get_all_tiles_data(dev.sdk)
+    print("Outputting the first 5 rows from each tile:")
+    for tile in dev_tiles:
+        print(tile.head())
+
+

@@ -1,3 +1,5 @@
 scratchwork/.DS_Store
 .gitignore
 dev_vs_prod_testing/looker.ini
+dev_vs_prod_testing/__pycache__/*
+dev_vs_prod_checker/looker.ini
