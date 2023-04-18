@@ -122,19 +122,6 @@ class Dashboard:
         if tile.title_text_as_html:
             return "Markdown File"
 
-
-def quickstart():
-    prod = LookerEnvironment('production',config_instance='VM')
-    dev = LookerEnvironment('dev',config_instance='VM')
-
-    print("Checking Production Authentication: Seeing if Looker can connect to the instance and outputting the credentials of user:")
-    print(prod.me())
-
-    print("Checking Development Authentication: Seeing if Looker can connect to the instance and outputting the credentials of user:")
-    print(dev.me())
-
-
-
 if __name__ == '__main__':
     # Set the branch and project
     config = configparser.ConfigParser()
