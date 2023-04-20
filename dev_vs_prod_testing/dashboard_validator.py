@@ -181,8 +181,3 @@ if __name__ == '__main__':
     for tile in dev_tiles:
         print(tile.head())
 
-    # for tile in prod_tiles:
-    #     print(tile.head())
-    #     print dev_tiles
-
-
