@@ -98,6 +98,8 @@ class Dashboard:
         """
         tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
         dfs = []
+        merge_list = []
+        #test2=[]
         for tile in tiles_in_dashboard:
             type_of_tile = self.map_tile_metadata_to_type(tile)
             #print(type_of_tile)
@@ -105,6 +107,24 @@ class Dashboard:
                 df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
                 # Apply a sorting to all columns, columns sorted in ascending order
                 dfs.append(self.sort_all_columns(df))
+            elif type_of_tile == 'Tile:Merged Query':
+                merge_list = sdk.merge_query(tile.merge_result_id)
+                #query_id_list = []
+                for source_query in merge_list.source_queries:
+                    #query_id_list.append(source_query.query_id)
+                    df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
+                    dfs.append(self.sort_all_columns(df))
+    #                 
+    # Here's another method of appending to dfs but using run_inline_query
+    # First define this above: 
+    #   test2=[]
+    # Then add this instead of the current for loop on source_query:
+    #             for source_query in merge_list.source_queries:
+    #                  test2.append(sdk.query(query_id=source_query.query_id,fields="model,view,fields,pivots,fill_fields,filters,filter_expression,sorts,limit,column_limit,total,row_total,subtotals,vis_config,filter_config,visible_ui_sections,dynamic_fields,query_timezone"))
+    #             for querydef in test2:
+    #                 df = pd.read_json(sdk.run_inline_query(result_format='json',body = querydef))
+    #                 dfs.append(self.sort_all_columns(df))           
+
             else:
                 print(f"Skipping: {type_of_tile}")
         return dfs
@@ -160,5 +180,4 @@ if __name__ == '__main__':
     print("Outputting the first 5 rows from each tile:")
     for tile in dev_tiles:
         print(tile.head())
-
 
