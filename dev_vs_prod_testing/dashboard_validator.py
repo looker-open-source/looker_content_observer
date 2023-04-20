@@ -100,7 +100,7 @@ class Dashboard:
         dfs = []
         for tile in tiles_in_dashboard:
             type_of_tile = self.map_tile_metadata_to_type(tile)
-            
+            #print(type_of_tile)
             if type_of_tile == 'Tile':
                 df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
                 # Apply a sorting to all columns, columns sorted in ascending order
@@ -111,10 +111,11 @@ class Dashboard:
     
     def map_tile_metadata_to_type(self,tile):
         if tile.title:
-            if tile.query:
-                return "Tile"
-            else: 
+            #print(tile.merge_result_id)
+            if tile.merge_result_id:
                 return "Tile:Merged Query"
+            else: 
+                return "Tile"
 
         if tile.rich_content_json:
             return "TextBox or Button/Link"
@@ -129,16 +130,17 @@ if __name__ == '__main__':
     # Turn into argparse
     config_file = "looker.ini"
     config.read(config_file)
-    dev_branch = config['VM']['dev_branch']
-    project_name = config['VM']['project']
+    dev_branch = config['gcpm234']['dev_branch']
+    project_name = config['gcpm234']['project']
     
 
     # Instantiate the dev and prod sdks
-    prod = LookerEnvironment('production',config_instance='VM')
-    dev = LookerEnvironment('dev',config_instance='VM')
+    prod = LookerEnvironment('production',config_instance='gcpm234')
+    dev = LookerEnvironment('dev',config_instance='gcpm234')
+    # print(dev.me)
     #Change/Enter the dashboard id in the below: 
     # Example: https://my.looker.com19999/dashboards/4 -> Dashboard('4')
-    dashboard = Dashboard('2') # Enter the dashboard number you'd like to test here
+    dashboard = Dashboard('13') # Enter the dashboard number you'd like to test here
 
     print("\033[95mTesting Production:\033[00m")
     print("Looping through all dev tiles for the dashboard:")

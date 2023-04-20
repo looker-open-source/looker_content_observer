@@ -25,15 +25,15 @@ def quickstart_check_authentication(instance_name):
     dev = LookerEnvironment('dev',config_instance=instance_name)
 
     print(ColorPrint.yellow + "Printing Production Users Credentials:"+ ColorPrint.end + "\n")
-    print(prod.me)
+    #print(prod.me)
     print(ColorPrint.green + "Authentication to production branch of instance, successful." + ColorPrint.green)
 
     print(ColorPrint.cyan + "\nPrinting Development Users Credentials:"+ ColorPrint.end + "\n")
-    print(dev.me)
+    #print(dev.me)
     print(ColorPrint.green + "Authentication to dev branch of instance, successful." + ColorPrint.green)
 
 if __name__ == "__main__":
     try:
-        quickstart_check_authentication('VM')
+        quickstart_check_authentication('gcpm234')
     except:
         print("There was an error trying to authenticate to your instance. Please check your API keys and/or ")
