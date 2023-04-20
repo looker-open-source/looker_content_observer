@@ -1,3 +1,4 @@
 looker.ini
-python-version
-cloud_testing/dev_vs_prod_testing/__pycache__/
+scratchwork/.DS_Store
+dev_vs_prod_testing/__pycache__/
+.python-version
