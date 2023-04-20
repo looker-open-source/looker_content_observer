@@ -34,6 +34,7 @@ def quickstart_check_authentication(instance_name):
 
 if __name__ == "__main__":
     try:
-        quickstart_check_authentication('gcpm234')
+        # replace this with the instance from your looker.ini file that you want to test for connectivity
+        quickstart_check_authentication('LookerUAT')
     except:
         print("There was an error trying to authenticate to your instance. Please check your API keys and/or ")
