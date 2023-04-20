@@ -99,7 +99,7 @@ class Dashboard:
         tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
         dfs = []
         merge_list = []
-        test2=[]
+        #test2=[]
         for tile in tiles_in_dashboard:
             type_of_tile = self.map_tile_metadata_to_type(tile)
             #print(type_of_tile)
@@ -124,21 +124,7 @@ class Dashboard:
     #             for querydef in test2:
     #                 df = pd.read_json(sdk.run_inline_query(result_format='json',body = querydef))
     #                 dfs.append(self.sort_all_columns(df))           
-                
-                
-                
-                    # print(sdk.run_inline_query(result_format='json',body = querydef))
-                #print(query_id_list)
-                #print(test2)
 
-                # for query_id in query_id_list:
-                #     test2=sdk.query(query_id)
-
-                
-                # df = pd.read_json(sdk.run_query(query_id=test2result_format='json',body = test2.Query))
-                # print(test.source_queries['query_id'])
-                # for i in df.source_queries:
-                #     print(test.source_queries[i]['query_id'])
             else:
                 print(f"Skipping: {type_of_tile}")
         return dfs
