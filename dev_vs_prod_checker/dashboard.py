@@ -1,4 +1,5 @@
 import pandas as pd
+from colorprint import ColorPrint
 
 class Dashboard: 
     def __init__(self,dashboard_id) -> None:
@@ -27,16 +28,22 @@ class Dashboard:
         :returns:
         - list of dataframes
         """
-        tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
+        try:
+            tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
+        except:
+            print("Error when attempting get_all_dashboard_elements() method. Unable to retrieve dashboard elements")
+        
+        if len(tiles_in_dashboard) == 0:
+            raise Exception(ColorPrint.red + "The dashboard appears to have no elements in it." + ColorPrint.end)
+        
         dfs = []
         merge_list = []
         for tile in tiles_in_dashboard:
             type_of_tile = self.map_tile_metadata_to_type(tile)
-            #print(type_of_tile)
             if type_of_tile == 'Tile':
-                df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
-                # Apply a sorting to all columns, columns sorted in ascending order
-                dfs.append(self.sort_all_columns(df))
+                df = self.map_tile(sdk,tile)
+                # dfs.append(self.sort_all_columns(df))
+                dfs.append(df)
             elif type_of_tile == 'Tile:Merged Query':
                 merge_list = sdk.merge_query(tile.merge_result_id)
                 #query_id_list = []
@@ -61,3 +68,18 @@ class Dashboard:
 
         if tile.title_text_as_html:
             return "Markdown File"
+        
+    def map_tile(self,sdk:object,tile):
+        """
+        overview: 
+        - Depending on if the tile is from a LookML dashboard or UDF, the parameters and methods to retrieve the data from the dashboard are differnet
+        """
+        if tile.result_maker:
+            if tile.result_maker.query_id:
+                # return pd.read_json(sdk.run_inline_query(result_format='json',body = tile.result_maker.query))
+                return pd.read_json(sdk.run_query(result_format='json',query_id=tile.result_maker.query_id))
+            else:
+                print(ColorPrint.red + "Else hit" + ColorPrint.end)
+                print(tile.result_maker.query_id)
+        else: 
+            pass
