@@ -39,6 +39,8 @@ class LookerEnvironment:
          - project_name: Looker project name
          - project_name: Name of branch being developed on, note please commit all code prior to running this method
         """
+        # Step 1: Swap to Dev Mode
+        self.switch_environment()
         print("Note: Please ensure dev branch has all code committed prior to running.")
         body = {"name":branch_name}
         self.sdk.update_git_branch(project_id=project_name, body=body)
