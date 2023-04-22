@@ -36,15 +36,17 @@ if __name__ == '__main__':
     except:
         print("Error in setting the instance configurations")
 
-    dc = DashboardChecker(dashboard_to_test)
-    instance_sdks = [prod.sdk,dev.sdk]   
+    instances = [prod,dev]   
+    dc = DashboardChecker(dashboard_to_test,*instances)
         
-    tests = [dc.unit_test_number_of_dashboard_elemets,
-             dc.data_test_tile_match
+    tests = [
+            #dc.unit_test_number_of_dashboard_elemets,
+            # dc.data_test_tile_match,
+            dc.parse_dashboard
              ]
-    
+
     for test in tests:
-        test(*instance_sdks)
+        test()
     
     print(dc.test_results)
 

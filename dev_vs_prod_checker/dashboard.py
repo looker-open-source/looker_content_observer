@@ -5,6 +5,11 @@ class Dashboard:
     def __init__(self,dashboard_id) -> None:
         self.dashboard_id = dashboard_id
 
+    def get_dashboard(self, sdk:object) -> list:
+        """
+        """ 
+        return sdk.dashboard(self.dashboard_id)
+
     def get_all_dashboard_elements(self, sdk:object) -> list:
         """
         :returns: All tile infromation from a dashboard (based on the dashboard id)
@@ -83,3 +88,6 @@ class Dashboard:
                 print(tile.result_maker.query_id)
         else: 
             pass
+
+
+    
