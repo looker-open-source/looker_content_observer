@@ -3,10 +3,12 @@ from dashboard import Dashboard
 from dashboardchecker import DashboardChecker
 import configparser
 import argparse
+from colorprint import ColorPrint
 import pandas as pd
 
-# dashboard_to_test = "jhu_covid::jhu_base_template_extend"
+dashboard_to_test = "jhu_covid::jhu_base_template_extend"
 dashboard_to_test = "5"
+dashboard_to_test = "2"
 
 def config_instance():
     # Specify the instance to connect to from the argparse
@@ -48,9 +50,16 @@ if __name__ == '__main__':
     for test in tests:
         test()
     
-    print(dc.test_results)
+    print(ColorPrint.cyan+"After running tests, each test will hav a record stored, looking like the below:"+ColorPrint.end)
+    for test_record in dc.test_results:
+        print(test_record)
 
+
+    print(ColorPrint.green+"\nOutput of an example csv/dataframe of the results and an example test:"+ColorPrint.end)
     df = pd.DataFrame(dc.test_results)
-    print(df)
+    df = df.T
+    df.columns = df.iloc[0]
+    df['is_match'] = df.iloc[:,0] == df.iloc[:,1] 
+    print(df.iloc[1:,:])
 
     df.to_csv("output_of_test_results.csv",index=False)
