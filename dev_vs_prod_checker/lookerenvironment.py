@@ -1,6 +1,8 @@
 import pandas as pd
 import looker_sdk
 import urllib3
+from colorprint import ColorPrint
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
 
 class LookerEnvironment:
@@ -29,7 +31,7 @@ class LookerEnvironment:
         """
         body = {"workspace_id":self.environment}
         self.sdk.update_session(body=body)
-        print(f"\033[93mSwitched to {self.environment} environment\033[00m")
+        # print(f"\033[93mSwitched to {self.environment} environment\033[00m")
     
     def checkout_dev_branch(self,project_name:str,branch_name:str) -> None:
         """
@@ -39,10 +41,12 @@ class LookerEnvironment:
          - project_name: Looker project name
          - project_name: Name of branch being developed on, note please commit all code prior to running this method
         """
-        print("Note: Please ensure dev branch has all code committed prior to running.")
+        # Step 1: Swap to Dev Mode
+        self.switch_environment()
+        # print("Note: Please ensure dev branch has all code committed prior to running.")
         body = {"name":branch_name}
         self.sdk.update_git_branch(project_id=project_name, body=body)
-        print(f"Switched to {branch_name} in {project_name}")
+        print(f"Note: Dev instance set to {branch_name} in {project_name}")
     
     def get_session(self) -> object:
         """

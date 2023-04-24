@@ -2,3 +2,6 @@ looker.ini
 scratchwork/.DS_Store
 dev_vs_prod_testing/__pycache__/
 .python-version
+dev_vs_prod_checker/__pycache__/*
+dev_vs_prod_checker/output_of_test_results.csv
+dev_vs_prod_checker/test.ipynb
