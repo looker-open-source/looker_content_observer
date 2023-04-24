@@ -46,7 +46,7 @@ class LookerEnvironment:
         # print("Note: Please ensure dev branch has all code committed prior to running.")
         body = {"name":branch_name}
         self.sdk.update_git_branch(project_id=project_name, body=body)
-        print(ColorPrint.yellow + f"Dev test set to {branch_name} in {project_name}" + ColorPrint.end)
+        print(f"Note: Dev instance set to {branch_name} in {project_name}")
     
     def get_session(self) -> object:
         """
