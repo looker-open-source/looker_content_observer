@@ -46,7 +46,7 @@ class DashboardChecker(Dashboard):
             print("\nRunning" +
                  ColorPrint.blue + f" {method_to_test} " + ColorPrint.end +
                    "test between: " + ColorPrint.yellow + f"{instances_name_a}" +  ColorPrint.end + " vs. " + 
-                   ColorPrint.cyan + f"{instances_name_a}" + ColorPrint.end)
+                   ColorPrint.cyan + f"{instances_name_b}" + ColorPrint.end)
             
             output = Test.is_equal(instance_test_a,instance_test_b)
             
