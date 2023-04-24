@@ -24,7 +24,7 @@ def config_instance():
     project_name = config[args.instance]['project']
     return args.instance, dev_branch,project_name    
 
-def config_checks(path_to_config_file):
+def config_test(path_to_config_file):
     config = configparser.ConfigParser()
     file = path_to_config_file
     config.read(file)
@@ -86,6 +86,6 @@ if __name__ == '__main__':
     instance, dev_branch, project_name = config_instance()
     
     # run_tests()
-    dashboard_checks = config_checks('config_tests.ini')
+    dashboard_checks = config_test('config_tests.ini')
 
     run_tests(dashboard_checks)

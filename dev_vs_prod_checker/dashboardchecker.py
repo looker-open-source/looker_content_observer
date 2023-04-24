@@ -55,6 +55,7 @@ class DashboardChecker(Dashboard):
             else: 
                 print("-->Result:" + ColorPrint.red + " FAIL " + f"Check:{instance_test_a}!={instance_test_b}" + ColorPrint.end)
 
+    # Below line 57 is used for testing
     def unit_test_number_of_dashboard_elemets(self):
         test_a = len(self.get_all_dashboard_elements(self.instance_1.sdk))
         test_b = len(self.get_all_dashboard_elements(self.instance_2.sdk))
