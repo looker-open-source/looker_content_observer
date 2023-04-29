@@ -80,6 +80,21 @@ class Dashboard:
         """ 
         return sdk.dashboard_dashboard_elements(self.dashboard_id)
 
+    def get_dashboard_elements(self, sdk:object) -> list:
+        """
+        :returns: All tile infromation from a dashboard (based on the dashboard id)
+        - Example: https://my.looker.com19999/dashboards/4 -> dashboard_id = '4'
+        """ 
+        return sdk.dashboard(self.dashboard_id, fields="dashboard_elements")
+    
+    #this method is unused so far
+    def get_dashboard_filters(self, sdk:object) -> list:
+        """
+        :returns: All tile infromation from a dashboard (based on the dashboard id)
+        - Example: https://my.looker.com19999/dashboards/4 -> dashboard_id = '4'
+        """ 
+        return sdk.dashboard(self.dashboard_id, fields="dashboard_filters")
+
     def sort_all_columns(self,df) -> pd.DataFrame:
         """
         overview:
@@ -96,24 +111,55 @@ class Dashboard:
         :returns:
         - list of dataframes
         """
-        tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
+        tiles_in_dashboard = self.get_dashboard_elements(sdk)
+        # open('text2.txt', 'w').close()
+        # f = open("text3.txt", "w")
+        # f.writelines(str(tiles_in_dashboard))
+        # f.close()
+        
+        # tile1=tiles_in_dashboard.dashboard_elements
+        # open('text3.txt', 'w').close()
+        # f = open("text3.txt", "w")
+        # f.writelines(str(tile1))
+        # f.close()
+
+        # all_tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
+        # open('text2.txt', 'w').close()
+        # f = open("text2.txt", "w")
+        # f.writelines(str(all_tiles_in_dashboard))
+        # f.close()
+
         dfs = []
+        result_maker_list = []
         merge_list = []
+
         #test2=[]
-        for tile in tiles_in_dashboard:
+        
+        #This works for the prod run but takes FOREVER. Timed out on dev run. But it works for lookml dashboards. I commented out the merge stuff to narrow the dev to just normal tiles but i imagine the same would work for merge (or similar)
+        for tile in tiles_in_dashboard.dashboard_elements:
             type_of_tile = self.map_tile_metadata_to_type(tile)
             #print(type_of_tile)
             if type_of_tile == 'Tile':
-                df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
+                # print(tile.result_maker)
+                result_maker_list.append(tile.result_maker)
+                for result_maker in result_maker_list:
+                    df = pd.read_json(sdk.run_query(query_id=result_maker.query_id,result_format='json'))
+
+                # df = pd.read_json(sdk.run_inline_query(result_format='json',body = tile.query))
                 # Apply a sorting to all columns, columns sorted in ascending order
                 dfs.append(self.sort_all_columns(df))
-            elif type_of_tile == 'Tile:Merged Query':
-                merge_list = sdk.merge_query(tile.merge_result_id)
-                #query_id_list = []
-                for source_query in merge_list.source_queries:
-                    #query_id_list.append(source_query.query_id)
-                    df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
-                    dfs.append(self.sort_all_columns(df))
+            
+            
+            # elif type_of_tile == 'Tile:Merged Query':
+            #     merge_list = sdk.merge_query(tile.merge_result_id)
+            #     #query_id_list = []
+            #     for source_query in merge_list.source_queries:
+            #         #query_id_list.append(source_query.query_id)
+            #         df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
+            #         dfs.append(self.sort_all_columns(df))
+    
+    
+    
     #                 
     # Here's another method of appending to dfs but using run_inline_query
     # First define this above: 
@@ -160,7 +206,7 @@ if __name__ == '__main__':
     # print(dev.me)
     #Change/Enter the dashboard id in the below: 
     # Example: https://my.looker.com19999/dashboards/4 -> Dashboard('4')
-    dashboard = Dashboard('13') # Enter the dashboard number you'd like to test here
+    dashboard = Dashboard('data_block_acs_bigquery::acs_census_overview') # Enter the dashboard number you'd like to test here
 
     print("\033[95mTesting Production:\033[00m")
     print("Looping through all dev tiles for the dashboard:")
