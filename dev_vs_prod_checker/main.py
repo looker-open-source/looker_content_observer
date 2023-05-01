@@ -6,9 +6,9 @@ import argparse
 from colorprint import ColorPrint
 import pandas as pd
 
-dashboard_to_test = "jhu_covid::jhu_base_template_extend"
+# dashboard_to_test = "jhu_covid::jhu_base_template_extend"
 # dashboard_to_test = "5"
-# dashboard_to_test = "2"
+dashboard_to_test = "2"
 
 def config_instance():
     # Specify the instance to connect to from the argparse
@@ -66,20 +66,10 @@ def run_tests(check_test):
 
     print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
     print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
-    # for test_record in dc.test_results:
-    #     print(test_record)
 
-    # print(dc.tests_to_run)
-    # print(ColorPrint.green+"\nOutput of an example csv/dataframe of the results and an example test:"+ColorPrint.end)
-    
     df = pd.DataFrame(dc.test_results)
     print(df)
-    # df = df.T
-    # df.columns = df.iloc[0]
-    # df['is_match'] = df.iloc[:,0] == df.iloc[:,1] 
-    # print(df.iloc[1:,:])
 
-    # df.to_csv("output_of_test_results.csv",index=False)
 
 if __name__ == '__main__':
     # Set instance configs

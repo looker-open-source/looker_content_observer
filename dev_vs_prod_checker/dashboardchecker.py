@@ -9,6 +9,7 @@ class DashboardChecker(Dashboard):
         self.instance_2 = instance_2
         self.instances = [self.instance_1,self.instance_2]
         self.tests_to_run = tests_to_run
+        self.api_methods = ['get_tile_data']
 
     def format_output(self,test_name,test_a,test_b,result):
         output = {
@@ -20,6 +21,7 @@ class DashboardChecker(Dashboard):
         return output
     
     def parse_dashboard(self):
+        # To do: split this method into mulitple parts
         for instance in self.instances:
             dash = self.get_dashboard(instance.sdk)
 
@@ -27,9 +29,14 @@ class DashboardChecker(Dashboard):
                 output = {}
                 output['instance_environemnt'] = instance.config_instance + "." + instance.environment # Output: LookerUAT.production or LookerProd.dev 
                 output['dashboard_title'] = dash.title # Dashboard Title
-                output[method_to_test] = getattr(Test,method_to_test)(dash)
+                if method_to_test in self.api_methods:
+                    output[method_to_test] = getattr(Test,method_to_test)(dash,instance.sdk)
+                    print(output)
+                else:
+                    output[method_to_test] = getattr(Test,method_to_test)(dash)
                 self.test_results.append(output)
-    
+
+
     def output_tests(self):
         """
         - To do: Clean up this output method
@@ -48,7 +55,12 @@ class DashboardChecker(Dashboard):
                    "test between: " + ColorPrint.yellow + f"{instances_name_a}" +  ColorPrint.end + " vs. " + 
                    ColorPrint.cyan + f"{instances_name_b}" + ColorPrint.end)
             
-            output = Test.is_equal(instance_test_a,instance_test_b)
+            # To do: switch output based on if test output is coming from a dataframe or other data type 
+            if method_to_test == 'get_tile_data':
+                # To do: If query_id is different between instances, how to check if data is the same?
+                output = Test.is_dataframe_equal(instance_test_a,instance_test_b)
+            else:
+                output = Test.is_equal(instance_test_a,instance_test_b)
             
             if output:
                 print("-->Result:" + ColorPrint.green + " PASS " + f"Check:{instance_test_a}=={instance_test_b}" + ColorPrint.end)
