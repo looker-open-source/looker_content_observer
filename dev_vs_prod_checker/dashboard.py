@@ -3,8 +3,9 @@ from colorprint import ColorPrint
 import json
 
 class Dashboard: 
-    def __init__(self,dashboard_id) -> None:
+    def __init__(self,dashboard_id,kwargs) -> None:
         self.dashboard_id = dashboard_id
+        self.kwargs = kwargs
 
     def get_dashboard(self, sdk:object) -> list:
         """

@@ -1,6 +1,7 @@
 import pandas as pd
 from dashboard import Dashboard
 import json
+
 class Test:
     def is_equal(a,b) -> bool:
         return a == b
@@ -31,7 +32,8 @@ class Test:
     def get_hash_of_query_from_dashboard(dash):
         queries = []
         for dash_element in dash.dashboard_elements:
-            print(dash_element)
+            pass
+            # print(dash_element)
         return None
     
     def get_composition_of_dashboard(dash):
@@ -78,17 +80,19 @@ class Test:
     
     def get_tile_data(dash,sdk:object):
         dfs = []
-        merge_list = []
-
         for tile in dash.dashboard_elements:
+            # print("Checking............................",Test.get_name_of_tile(tile))
+            # print("Type of Tile.........................",tile.type)
             if tile.type == 'vis':
-                if tile.query_id != None: 
-                    df = pd.read_json(sdk.run_query(query_id=tile.query_id,result_format='json'))
-                    print(df.head())
-                    dfs.append(df)
-                elif tile.merge_result_id != None:
-                    merge_list = sdk.merge_query(tile.merge_result_id)
-                    for source_query in merge_list.source_queries:
-                        df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
-                        dfs.append(df)
+                # result_maker_list.append(tile.result_maker)
+                # print("Length of result maker is",len(tile.result_maker))
+                # for result_maker in result_maker_list:
+                # print("QueryID from result maker is",tile.result_maker.query_id)
+                df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
+                output = {'df':df,
+                          "query_id":tile.result_maker.query_id,
+                          "is_empty": df.empty,
+                          "shape":df.shape,
+                          "tile_title":tile.title}
+                dfs.append(output)
         return dfs
