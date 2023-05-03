@@ -10,17 +10,8 @@ class DashboardChecker(Dashboard):
         self.instances = [self.instance_1,self.instance_2]
         self.tests_to_run = tests_to_run
         self.api_methods = ['get_tile_data']
-
-    def format_output(self,test_name,test_a,test_b,result):
-        output = {
-                "test_name":test_name,
-                "instance_1":test_a, 
-                "instance_2":test_b, 
-                "test_result":result,
-                }
-        return output
     
-    def parse_dashboard(self):
+    def run_tests(self):
         # To do: split this method into mulitple parts
         for instance in self.instances:
             dash = self.get_dashboard(instance.sdk)
@@ -35,7 +26,6 @@ class DashboardChecker(Dashboard):
                 else:
                     output[method_to_test] = getattr(Test,method_to_test)(dash)
                 self.test_results.append(output)
-
 
     def output_tests(self):
         """
