@@ -6,9 +6,9 @@ import argparse
 from colorprint import ColorPrint
 import pandas as pd
 
-# dashboard_to_test = "jhu_covid::jhu_base_template_extend"
+dashboard_to_test = "jhu_covid::jhu_base_template_extend"
 # dashboard_to_test = "5"
-dashboard_to_test = "13"
+# dashboard_to_test = "13"
 
 def config_instance():
     # Specify the instance to connect to from the argparse
@@ -30,16 +30,14 @@ def config_test(path_to_config_file):
     config.read(file)
     # Checks sections within checks config file
     # print(config._sections)
-
-    # Dashboard Checks 
-    dashboard_checks = []
+    tests_to_run = []
     for test,run_test in config._sections['Dashboard'].items():
         if run_test.lower() == "true":
-            dashboard_checks.append(test)
-    return dashboard_checks
+            tests_to_run.append(test)
+    return tests_to_run
 
 
-def run_tests(check_test):
+def run_tests(tests_to_run):
     try:
         prod = LookerEnvironment('production',config_instance=instance)
         dev = LookerEnvironment('dev',config_instance=instance)
@@ -50,20 +48,16 @@ def run_tests(check_test):
         print("Error in setting the instance configurations")
 
     instances = [prod,dev]   
-    dc = DashboardChecker(dashboard_to_test,*instances,check_test)
-    
-    
-    tests = [
-            #dc.unit_test_number_of_dashboard_elemets,
-            # dc.data_test_tile_match,
-            dc.parse_dashboard
-             ]
+    dc = DashboardChecker(dashboard_to_test,*instances,tests_to_run)
+        
+    # to do: create a dc.run_tests method
+    # Step 1: Run the tests
+    dc.run_tests()
 
-    for test in tests:
-        test()
- 
+    # Step 2: Log and print out the outputs
     dc.output_tests()
 
+    # Step 3: Output a dataframe we can turn into a CSV
     print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
     print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
 
@@ -75,7 +69,8 @@ if __name__ == '__main__':
     # Set instance configs
     instance, dev_branch, project_name = config_instance()
     
-    # run_tests()
-    dashboard_checks = config_test('config_tests.ini')
+    # Set the configuration of tests you would like to run on your dashboard
+    dashboard_to_check = config_test('config_tests.ini')
 
-    run_tests(dashboard_checks)
+    # Run the tests
+    run_tests(dashboard_to_check)
