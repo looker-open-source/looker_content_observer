@@ -88,11 +88,16 @@ class Test:
                 # print("Length of result maker is",len(tile.result_maker))
                 # for result_maker in result_maker_list:
                 # print("QueryID from result maker is",tile.result_maker.query_id)
-                df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
+                failed_to_get_data = False                
+                try: 
+                    df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
+                except: 
+                    failed_to_get_data = True
                 output = {'df':df,
                           "query_id":tile.result_maker.query_id,
                           "is_empty": df.empty,
                           "shape":df.shape,
-                          "tile_title":tile.title}
+                          "tile_title":tile.title, 
+                          "could_get_api_data":failed_to_get_data}
                 dfs.append(output)
         return dfs
