@@ -1,9 +1,11 @@
 import pandas as pd
 from colorprint import ColorPrint
+import json
 
 class Dashboard: 
-    def __init__(self,dashboard_id) -> None:
+    def __init__(self,dashboard_id,kwargs) -> None:
         self.dashboard_id = dashboard_id
+        self.kwargs = kwargs
 
     def get_dashboard(self, sdk:object) -> list:
         """
@@ -88,6 +90,18 @@ class Dashboard:
                 print(tile.result_maker.query_id)
         else: 
             pass
-
+    
+    def get_name_of_tile(self,tile):
+        if tile.type == 'button':
+            try:
+                return json.loads(tile.rich_content_json)['text']
+            except: 
+                return "Error with parsing JSON of button"
+        elif tile.type == 'text':
+            return tile.title_text_as_html
+        elif tile.type == 'vis':
+            return tile.title
+        else:
+            return "Unmapped"
 
     
