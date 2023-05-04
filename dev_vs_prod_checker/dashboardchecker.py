@@ -70,6 +70,15 @@ class DashboardChecker(Dashboard):
                 for df_output_dict in range(len(combined_test)):
                     print(ColorPrint.cyan+f"Checking tile number:{df_output_dict}"+ColorPrint.end)
 
+                    print(f"\n-->Checking: If API was succesfully able to run query_id")
+                    has_data = lambda bool_a, bool_b: (bool_a == False) and (bool_b == False)  
+                    api_a, api_b = instance_test_a[df_output_dict]['could_get_api_data'],instance_test_b[df_output_dict]['could_get_api_data']
+                    output = has_data(api_a,api_b) 
+                    if output:
+                        print("-->Result:" + ColorPrint.green + " PASS " + f"Check: {output}" + ColorPrint.end)
+                    else: 
+                        print("-->Result:" + ColorPrint.red + " FAIL " + f"Check: {output}" + ColorPrint.end)
+
                     print(f"\n-->Checking: Name of Tiles Match")
                     title_a, title_b = instance_test_a[df_output_dict]['tile_title'],instance_test_b[df_output_dict]['tile_title']
                     output = Test.is_equal(title_a,title_b)
