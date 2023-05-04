@@ -68,7 +68,7 @@ class DashboardChecker(Dashboard):
 
             if method_to_test == 'get_tile_data':
                 for df_output_dict in range(len(combined_test)):
-                    print(ColorPrint.cyan+f"Checking tile numebr:{df_output_dict}"+ColorPrint.end)
+                    print(ColorPrint.cyan+f"Checking tile number:{df_output_dict}"+ColorPrint.end)
 
                     print(f"\n-->Checking: Name of Tiles Match")
                     title_a, title_b = instance_test_a[df_output_dict]['tile_title'],instance_test_b[df_output_dict]['tile_title']
