@@ -85,6 +85,19 @@ class DashboardChecker(Dashboard):
                     else: 
                         print("-->Result:" + ColorPrint.red + " FAIL " + f"Check: {output}" + ColorPrint.end)
 
+                    print(f"\n-->Checking: Was query run succesfully")
+                    data_a, data_b = instance_test_a[df_output_dict]['df'],instance_test_b[df_output_dict]['df']
+                    try:
+                        data_a.looker_error #need to think of a better way to test this, prints "Name: looker_error, dtype: object" unnecessarily
+                    except:
+                        output = True
+                    else:
+                        output = False
+                    if output:
+                        print("-->Result:" + ColorPrint.green + " PASS " + ColorPrint.end)
+                    else: 
+                        print("-->Result:" + ColorPrint.red + " FAIL " + data_a.looker_error + ColorPrint.end)
+
                     print(f"\n-->Checking: Name of Tiles Match")
                     title_a, title_b = instance_test_a[df_output_dict]['tile_title'],instance_test_b[df_output_dict]['tile_title']
                     output = Test.is_equal(title_a,title_b)

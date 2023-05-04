@@ -5,6 +5,8 @@ import configparser
 import argparse
 from colorprint import ColorPrint
 import pandas as pd
+# pd.set_option("display.max_colwidth", 1000)
+
 
 # dashboard_to_test = "jhu_covid::jhu_base_template_extend"
 # dashboard_to_test = "2"

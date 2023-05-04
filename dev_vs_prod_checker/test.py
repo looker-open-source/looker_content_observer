@@ -93,6 +93,7 @@ class Test:
                     failed_to_get_data = False                
                     try: 
                         df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
+                        pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
                     except: 
                         failed_to_get_data = True
                     output = {'df':df,
@@ -101,6 +102,7 @@ class Test:
                             "shape":df.shape,
                             "tile_title":tile.title, 
                             "could_get_api_data":failed_to_get_data}
+                    
                     dfs.append(output)
                 else: #handle case of a likely merge query
                     try: 
