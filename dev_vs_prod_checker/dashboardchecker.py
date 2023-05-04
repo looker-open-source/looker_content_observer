@@ -29,6 +29,10 @@ class DashboardChecker(Dashboard):
                 output['dashboard_title'] = dash.title # Dashboard Title
                 if method_to_test in self.api_methods: # Certain methods will need to make an additional API call
                     output[method_to_test] = getattr(Test,method_to_test)(dash,instance.sdk)
+                    if self.kwargs['logging']:
+                        print("Start Logging" + "." * 100)
+                        print("Checking the number of length of the output dict:",len(output[method_to_test]), f"for following test:{method_to_test}")
+                        print("End Logging" +  "." * 100)
                 else:
                     output[method_to_test] = getattr(Test,method_to_test)(dash)
                 self.test_results.append(output)
@@ -44,31 +48,33 @@ class DashboardChecker(Dashboard):
 
         :to do:
         - Create some helper methods for formatting so not all print statements needed to be so explicitly formatted
+        - create a method to confirm if the number of visualization tiles are the same 
+        - create a method to confirm the position of the tiles (based on id?) is the same
+        - confirm behavior of API if query_id does not exist
         """
         print(ColorPrint.underline + "Outputting Dashboard Level Tests:" + ColorPrint.end)
         for method_to_test in self.tests_to_run:
             combined_test = []
             for test_ouput in self.test_results:
+                # Check to confirm if names of the tests are the same
+                # Example of keys: dict_keys(['instance_environemnt', 'dashboard_title', 'get_tile_data'])
                 if method_to_test in test_ouput.keys():
                     combined_test.append(test_ouput)
             
             instances_name_a, instances_name_b = combined_test[0]['instance_environemnt'], combined_test[1]['instance_environemnt']
             instance_test_a, instance_test_b = combined_test[0][method_to_test], combined_test[1][method_to_test]       
             
-            if self.kwargs['logging']:
-                print("Start Logging" + "." * 100)
-                print("Length of each instance list:")
-                print(len(instances_name_a),len(instances_name_b))
-                print("End Logging" +  "." * 100)
 
             print("\nRunning" +
                 ColorPrint.blue + f" {method_to_test} " + ColorPrint.end +
                 "test between: " + ColorPrint.yellow + f"{instances_name_a}" +  ColorPrint.end + " vs. " + 
                 ColorPrint.cyan + f"{instances_name_b}" + ColorPrint.end)
 
-            if method_to_test == 'get_tile_data':
-                for df_output_dict in range(len(combined_test)):
-                    print(ColorPrint.cyan+f"Checking tile number:{df_output_dict}"+ColorPrint.end)
+            # Certain methods involve an extra API Call which will further nest the data
+            if method_to_test in self.api_methods:
+                # To do: List currently goes off the length of tiles in instance_a, need to update to add a check if both instances are generating X number of visualization tiles
+                for df_output_dict in range(len(combined_test[0][method_to_test])):
+                    print(ColorPrint.cyan+f"Checking tile number:{df_output_dict + 1}"+ColorPrint.end)
 
                     print(f"\n-->Checking: If API was succesfully able to run query_id")
                     has_data = lambda bool_a, bool_b: (bool_a == False) and (bool_b == False)  
