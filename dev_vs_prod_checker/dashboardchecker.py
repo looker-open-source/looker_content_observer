@@ -25,7 +25,7 @@ class DashboardChecker(Dashboard):
             dash = self.get_dashboard(instance.sdk)
             for method_to_test in self.tests_to_run:
                 output = {}
-                output['instance_environemnt'] = instance.config_instance + "." + instance.environment # Output: LookerUAT.production or LookerProd.dev 
+                output['instance_environment'] = instance.config_instance + "." + instance.environment # Output: LookerUAT.production or LookerProd.dev 
                 output['dashboard_title'] = dash.title # Dashboard Title
                 if method_to_test in self.api_methods: # Certain methods will need to make an additional API call
                     output[method_to_test] = getattr(Test,method_to_test)(dash,instance.sdk)
@@ -57,11 +57,11 @@ class DashboardChecker(Dashboard):
             combined_test = []
             for test_ouput in self.test_results:
                 # Check to confirm if names of the tests are the same
-                # Example of keys: dict_keys(['instance_environemnt', 'dashboard_title', 'get_tile_data'])
+                # Example of keys: dict_keys(['instance_environment', 'dashboard_title', 'get_tile_data'])
                 if method_to_test in test_ouput.keys():
                     combined_test.append(test_ouput)
             
-            instances_name_a, instances_name_b = combined_test[0]['instance_environemnt'], combined_test[1]['instance_environemnt']
+            instances_name_a, instances_name_b = combined_test[0]['instance_environment'], combined_test[1]['instance_environment']
             instance_test_a, instance_test_b = combined_test[0][method_to_test], combined_test[1][method_to_test]       
             
 
