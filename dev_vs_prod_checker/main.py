@@ -10,7 +10,7 @@ import pandas as pd
 
 # dashboard_to_test = "jhu_covid::jhu_base_template_extend"
 # dashboard_to_test = "2"
-dashboard_to_test = "13"
+dashboard_list = ["13","14"]
 
 def config_instance():
     # Specify the instance to connect to from the argparse
@@ -55,22 +55,23 @@ def run_tests(tests_to_run,**kwargs):
     except:
         print("Error in setting the instance configurations")
 
-    instances = [prod,dev]   
-    dc = DashboardChecker(dashboard_to_test,kwargs,*instances,tests_to_run)
-        
-    # to do: create a dc.run_tests method
-    # Step 1: Run the tests
-    dc.run_tests()
+    instances = [prod,dev]  
+    for dashboard_to_test in dashboard_list:   
+        dc = DashboardChecker(dashboard_to_test,kwargs,*instances,tests_to_run)
+            
+        # to do: create a dc.run_tests method
+        # Step 1: Run the tests
+        dc.run_tests()
 
-    # Step 2: Log and print out the outputs
-    dc.output_tests()
+        # Step 2: Log and print out the outputs
+        dc.output_tests()
 
-    # Step 3: Output a dataframe we can turn into a CSV
-    # print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
-    # print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
+        # Step 3: Output a dataframe we can turn into a CSV
+        # print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
+        # print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
 
-    # df = pd.DataFrame(dc.test_results)
-    # print(df)
+        # df = pd.DataFrame(dc.test_results)
+        # print(df)
 
 
 if __name__ == '__main__':
