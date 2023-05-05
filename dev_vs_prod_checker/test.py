@@ -80,24 +80,45 @@ class Test:
     
     def get_tile_data(dash,sdk:object):
         dfs = []
+        merge_list = []
         for tile in dash.dashboard_elements:
             # print("Checking............................",Test.get_name_of_tile(tile))
             # print("Type of Tile.........................",tile.type)
-            if tile.type == 'vis':
-                # result_maker_list.append(tile.result_maker)
-                # print("Length of result maker is",len(tile.result_maker))
-                # for result_maker in result_maker_list:
-                # print("QueryID from result maker is",tile.result_maker.query_id)
-                failed_to_get_data = False                
-                try: 
-                    df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
-                except: 
-                    failed_to_get_data = True
-                output = {'df':df,
-                          "query_id":tile.result_maker.query_id,
-                          "is_empty": df.empty,
-                          "shape":df.shape,
-                          "tile_title":tile.title, 
-                          "could_get_api_data":failed_to_get_data}
-                dfs.append(output)
+            if tile.type == 'vis' or tile.type == 'looker_map':
+                if tile.query_id is not None: #most vis have a query ID, if they do not it is likely a merge query
+                    # result_maker_list.append(tile.result_maker)
+                    # print("Length of result maker is",len(tile.result_maker))
+                    # for result_maker in result_maker_list:
+                    # print("QueryID from result maker is",tile.result_maker.query_id)
+                    failed_to_get_data = False                
+                    try: 
+                        df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
+                        pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
+                    except: 
+                        failed_to_get_data = True
+                    output = {'df':df,
+                            "query_id":tile.result_maker.query_id,
+                            "is_empty": df.empty,
+                            "shape":df.shape,
+                            "tile_title":tile.title, 
+                            "could_get_api_data":failed_to_get_data}
+                    
+                    dfs.append(output)
+                else: #handle case of a likely merge query
+                    try: 
+                        merge_list = sdk.merge_query(tile.merge_result_id)
+                    except:
+                        failed_to_get_data = True
+                    for source_query in merge_list.source_queries:
+                        try:
+                            df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
+                        except:
+                            failed_to_get_data = True
+                        output = {'df':df,
+                            "query_id":source_query.query_id,
+                            "is_empty": df.empty,
+                            "shape":df.shape,
+                            "tile_title":tile.title, 
+                            "could_get_api_data":failed_to_get_data}
+                        dfs.append(output)
         return dfs
