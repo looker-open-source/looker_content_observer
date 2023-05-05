@@ -2,7 +2,7 @@
 
 
 ## How to Run
-1. Set up instances in /dev_vs_prod_checker/config.ini (see example looker_ini_file_example.ini for more details)
+1. Set up instances in /dev_vs_prod_checker/looker.ini (see example looker_ini_file_example.ini for more details)
 2. Configure dashboards to run in the `dashboard_list` variable in main.py
 3. Choose tests in config_tests.ini
 4. Run the following from /dev_vs_prod_checker/ folder
