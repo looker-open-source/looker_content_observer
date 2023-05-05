@@ -85,7 +85,7 @@ class Test:
             # print("Checking............................",Test.get_name_of_tile(tile))
             # print("Type of Tile.........................",tile.type)
             if tile.type == 'vis' or tile.type == 'looker_map':
-                if tile.query_id is not None: #most vis have a query ID, if they do not it is likely a merge query
+                if tile.result_maker.query_id is not None: #most vis have a query ID, if they do not it is likely a merge query
                     # result_maker_list.append(tile.result_maker)
                     # print("Length of result maker is",len(tile.result_maker))
                     # for result_maker in result_maker_list:

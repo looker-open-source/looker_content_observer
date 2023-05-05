@@ -6,9 +6,9 @@ import argparse
 from colorprint import ColorPrint
 import pandas as pd
 
-# dashboard_list = ["jhu_covid::jhu_base_template_extend"]
+dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
 # dashboard_list = ["2"]
-dashboard_list = ["13","14"]
+# dashboard_list = ["13","14"]
 
 def config_instance():
     # Specify the instance to connect to from the argparse
