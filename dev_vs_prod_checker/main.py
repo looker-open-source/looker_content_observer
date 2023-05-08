@@ -55,7 +55,7 @@ def run_tests(tests_to_run,**kwargs):
     except:
         print("Error in setting the instance configurations")
 
-    if kwargs['single']
+    if kwargs['single']:
         instances= [prod]
     else:
         instances = [prod,dev]  
