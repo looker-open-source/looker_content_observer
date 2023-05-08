@@ -1,20 +1,23 @@
 from lookerenvironment import LookerEnvironment
 from dashboard import Dashboard
 from dashboardchecker import DashboardChecker
+from dashboardcheckersingle import DashboardCheckerSingle
 import configparser
 import argparse
 from colorprint import ColorPrint
 import pandas as pd
 
-dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
+
+# dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
 # dashboard_list = ["2"]
-# dashboard_list = ["13","14"]
+dashboard_list = ["13","data_block_acs_bigquery::acs_census_overview"]
 
 def config_instance():
     # Specify the instance to connect to from the argparse
     parser = argparse.ArgumentParser(description='Arg to specify the instance to connect to.')
     parser.add_argument('--instance', '-i', help='Name of instance, as defined by the section within the looker.ini file')
     parser.add_argument('--logging', '-l', help='Add console logging to help with debugging',action='store_true')
+    parser.add_argument('--single', '-s', help='Run on a single instance+branch only',action='store_true')
     args = parser.parse_args()
     # looker.ini file will have the configurations to specify the branch and project
     config = configparser.ConfigParser()
@@ -42,34 +45,44 @@ def config_test(path_to_config_file,**kwargs):
             tests_to_run.append(test)
     return tests_to_run
 
-
 def run_tests(tests_to_run,**kwargs):
     try:
         prod = LookerEnvironment('production',config_instance=kwargs['instance'])
-        dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
-        dev.checkout_dev_branch(project_name,dev_branch)
+        if not kwargs['single']:
+            dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
+            dev.checkout_dev_branch(project_name,dev_branch)
     except NameError: 
         print("Error in specifying the instance name, please confirm your argument matches an instance section from the looker.ini file")
     except:
         print("Error in setting the instance configurations")
 
-    instances = [prod,dev]  
+    if kwargs['single']:
+        instances= [prod]
+    else:
+        instances = [prod,dev]  
+
     for dashboard_to_test in dashboard_list:   
-        dc = DashboardChecker(dashboard_to_test,kwargs,*instances,tests_to_run)
-            
-        # to do: create a dc.run_tests method
-        # Step 1: Run the tests
-        dc.run_tests()
+        if kwargs['single']:
+            dc = DashboardCheckerSingle(dashboard_to_test,kwargs,instances[0],tests_to_run)
+            dc.run_tests()
+            dc.output_tests()
 
-        # Step 2: Log and print out the outputs
-        dc.output_tests()
+        else:
+            dc = DashboardChecker(dashboard_to_test,kwargs,*instances,tests_to_run)
+                
+            # to do: create a dc.run_tests method
+            # Step 1: Run the tests
+            dc.run_tests()
 
-        # Step 3: Output a dataframe we can turn into a CSV
-        # print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
-        # print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
+            # Step 2: Log and print out the outputs
+            dc.output_tests()
 
-        # df = pd.DataFrame(dc.test_results)
-        # print(df)
+            # Step 3: Output a dataframe we can turn into a CSV
+            # print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
+            # print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
+
+            # df = pd.DataFrame(dc.test_results)
+            # print(df)
 
 
 if __name__ == '__main__':
