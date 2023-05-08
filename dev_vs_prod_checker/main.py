@@ -48,18 +48,18 @@ def config_test(path_to_config_file,**kwargs):
 def run_tests(tests_to_run,**kwargs):
     try:
         prod = LookerEnvironment('production',config_instance=kwargs['instance'])
-        # if not kwargs['single']:
-        dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
-        dev.checkout_dev_branch(project_name,dev_branch)
+        if not kwargs['single']:
+            dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
+            dev.checkout_dev_branch(project_name,dev_branch)
     except NameError: 
         print("Error in specifying the instance name, please confirm your argument matches an instance section from the looker.ini file")
     except:
         print("Error in setting the instance configurations")
 
-    # if kwargs['single']:
-        # instances= [prod]
-    # else:
-    instances = [prod,dev]  
+    if kwargs['single']:
+        instances= [prod]
+    else:
+        instances = [prod,dev]  
 
     for dashboard_to_test in dashboard_list:   
         if kwargs['single']:
