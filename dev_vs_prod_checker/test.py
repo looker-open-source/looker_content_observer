@@ -76,35 +76,56 @@ class Test:
             else:
                 composition[name_of_tile] += 1
         # Sort by keys
+        # print(composition)
         return sorted(composition.items())
     
     def get_tile_data(dash,sdk:object):
         dfs = []
         merge_list = []
+        composition = {}
         for tile in dash.dashboard_elements:
+            name_of_tile = Test.get_name_of_tile(tile)
+            if name_of_tile == None or name_of_tile == '':
+                name_of_tile = "None"
+            if name_of_tile not in composition:
+                composition[name_of_tile] = 1
+            else:
+                composition[name_of_tile] += 1
             # print("Checking............................",Test.get_name_of_tile(tile))
             # print("Type of Tile.........................",tile.type)
             if tile.type == 'vis' or tile.type == 'looker_map':
                 if tile.result_maker.query_id is not None: #most vis have a query ID, if they do not it is likely a merge query
+                    # Not using tile.query_id since that does not work on lookml dashboards
                     # result_maker_list.append(tile.result_maker)
                     # print("Length of result maker is",len(tile.result_maker))
                     # for result_maker in result_maker_list:
                     # print("QueryID from result maker is",tile.result_maker.query_id)
                     failed_to_get_data = False                
-                    try: 
+                    if tile.look_id == None: 
                         df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
                         pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
-                    except: 
-                        failed_to_get_data = True
-                    output = {'df':df,
+                        output = {'df':df,
                             "query_id":tile.result_maker.query_id,
                             "is_empty": df.empty,
                             "shape":df.shape,
                             "tile_title":tile.title, 
                             "could_get_api_data":failed_to_get_data}
+                        dfs.append(output)
+                    elif tile.look_id is not None: 
+                        df = pd.read_json(sdk.run_query(query_id=tile.look.query.id,result_format='json'))
+                        pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
+                        output = {'df':df,
+                            "query_id":tile.look.query.id,
+                            "is_empty": df.empty,
+                            "shape":df.shape,
+                            "tile_title":tile.look.title, 
+                            "could_get_api_data":failed_to_get_data}
+                        dfs.append(output)
+                    else:
+                        failed_to_get_data = True
+                        print("Failed to get data")
                     
-                    dfs.append(output)
-                else: #handle case of a likely merge query
+                elif tile.merge_result_id is not None: #handle a merge query
                     try: 
                         merge_list = sdk.merge_query(tile.merge_result_id)
                     except:
@@ -121,4 +142,7 @@ class Test:
                             "tile_title":tile.title, 
                             "could_get_api_data":failed_to_get_data}
                         dfs.append(output)
+                else:
+                    failed_to_get_data = True
+                    print("Fail to get data Fail Fail")
         return dfs
