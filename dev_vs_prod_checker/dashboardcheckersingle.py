@@ -76,7 +76,10 @@ class DashboardCheckerSingle(Dashboard):
                 for df_output_dict in range(len(combined_test[0][method_to_test])):
                     title_a = instance_test_a[df_output_dict]['tile_title']
                     #TODO: doesn't handle non query tiles e.g. text or button
-                    print(ColorPrint.cyan+f"Checking tile number {df_output_dict + 1}: "+title_a+ColorPrint.end) 
+                    try:
+                        print(ColorPrint.cyan+f"Checking tile number {df_output_dict + 1}: "+title_a+ColorPrint.end) 
+                    except:
+                        print(ColorPrint.cyan + "Checking a tile" + ColorPrint.end)
                     
                     print(f"\n-->Checking: Was query run succesfully")
                     data_a = instance_test_a[df_output_dict]['df']
