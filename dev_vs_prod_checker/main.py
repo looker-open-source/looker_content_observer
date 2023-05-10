@@ -9,8 +9,8 @@ import pandas as pd
 
 
 # dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
-# dashboard_list = ["11"]
-dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
+dashboard_list = ["802"]
+# dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
 
 def config_instance():
     # Specify the instance to connect to from the argparse
