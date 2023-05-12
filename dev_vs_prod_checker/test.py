@@ -112,7 +112,7 @@ class Test:
                         # print(df)
                         try:
                             df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
-                            pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
+                            pd.set_option("display.max_colwidth", 1000) # TODO: not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
                             output = {'df':df,
                                 "query_id":tile.result_maker.query_id,
                                 "is_empty": df.empty,
