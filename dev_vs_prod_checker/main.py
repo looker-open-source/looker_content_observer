@@ -2,6 +2,7 @@ from lookerenvironment import LookerEnvironment
 from dashboard import Dashboard
 from dashboardchecker import DashboardChecker
 from dashboardcheckersingle import DashboardCheckerSingle
+from lookcheckersingle import LookCheckerSingle
 import configparser
 import argparse
 from colorprint import ColorPrint
@@ -9,8 +10,10 @@ import pandas as pd
 
 
 # dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
-dashboard_list = ["802"]
-# dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
+# dashboard_list = [""]
+dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
+
+look_list = ["13","14"]
 
 def config_instance():
     # Specify the instance to connect to from the argparse
@@ -28,7 +31,7 @@ def config_instance():
     # return args.instance, dev_branch,project_name
     return args.__dict__, dev_branch,project_name    
 
-def config_test(path_to_config_file,**kwargs):
+def config_dashboard_test(path_to_config_file,**kwargs):
     config = configparser.ConfigParser()
     file = path_to_config_file
     config.read(file)
@@ -45,7 +48,24 @@ def config_test(path_to_config_file,**kwargs):
             tests_to_run.append(test)
     return tests_to_run
 
-def run_tests(tests_to_run,**kwargs):
+def config_look_test(path_to_config_file,**kwargs):
+    config = configparser.ConfigParser()
+    file = path_to_config_file
+    config.read(file)
+    # Checks sections within checks config file
+    if kwargs['logging']:
+        print("Start Logging" + "." * 100)
+        print("Tests from the config file:")
+        print(config._sections)
+        print("End Logging" +  "." * 100)
+    
+    tests_to_run = []
+    for test,run_test in config._sections['Look'].items():
+        if run_test.lower() == "true":
+            tests_to_run.append(test)
+    return tests_to_run
+
+def run_dashboard_tests(tests_to_run,**kwargs):
     try:
         prod = LookerEnvironment('production',config_instance=kwargs['instance'])
         if not kwargs['single']:
@@ -60,7 +80,7 @@ def run_tests(tests_to_run,**kwargs):
         instances= [prod]
     else:
         instances = [prod,dev]  
-
+    
     for dashboard_to_test in dashboard_list:   
         if kwargs['single']:
             dc = DashboardCheckerSingle(dashboard_to_test,kwargs,instances[0],tests_to_run)
@@ -85,14 +105,53 @@ def run_tests(tests_to_run,**kwargs):
             # print(df)
 
 
+def run_look_tests(tests_to_run,**kwargs):
+    try:
+        prod = LookerEnvironment('production',config_instance=kwargs['instance'])
+        if not kwargs['single']:
+            dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
+            dev.checkout_dev_branch(project_name,dev_branch)
+    except NameError: 
+        print("Error in specifying the instance name, please confirm your argument matches an instance section from the looker.ini file")
+    except:
+        print("Error in setting the instance configurations")
+
+    if kwargs['single']:
+        instances= [prod]
+    else:
+        instances = [prod,dev]  
+
+    for look_to_test in look_list:   
+        if kwargs['single']:
+            lc = LookCheckerSingle(look_to_test,kwargs,instances[0],tests_to_run)
+            lc.run_tests()
+            lc.output_tests()
+
+        else:
+            print("Look comparison is under construction, use -s arg to check single")
+    
+
+
 if __name__ == '__main__':
     # Set instance configs
     kwargs, dev_branch, project_name = config_instance()
     
-    # Set the configuration of tests you would like to run on your dashboard
-    dashboard_to_check = config_test('config_tests.ini',**kwargs)
+    if len(dashboard_list) > 0 and dashboard_list[0] != "":
+        # Set the configuration of tests you would like to run on your dashboard
+        dashboard_to_check = config_dashboard_test('config_tests.ini',**kwargs)
 
-    # Run the tests
-    run_tests(dashboard_to_check,**kwargs)
+        # Run the tests
+        run_dashboard_tests(dashboard_to_check,**kwargs)
+    else:
+        print("No dashboards to test")
+
+    if len(look_list) > 0 and look_list[0] != "":
+        # Set the configuration of tests you would like to run on your look
+        look_to_check = config_look_test('config_tests.ini',**kwargs)
+
+        # Run the tests
+        run_look_tests(look_to_check,**kwargs)
+    else:
+        print("No looks to test")
 
   
