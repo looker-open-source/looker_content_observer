@@ -3,44 +3,46 @@ from dashboard import Dashboard
 from dashboardchecker import DashboardChecker
 from dashboardcheckersingle import DashboardCheckerSingle
 from lookcheckersingle import LookCheckerSingle
+import logging
 import configparser
 import argparse
 from colorprint import ColorPrint
 import pandas as pd
 
-
-# dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
+dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
 # dashboard_list = [""]
-dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
+# dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
 
 look_list = ["13","14"]
 
-def config_instance():
+def setup():
+    # Set argparse configuration
     # Specify the instance to connect to from the argparse
     parser = argparse.ArgumentParser(description='Arg to specify the instance to connect to.')
-    parser.add_argument('--instance', '-i', help='Name of instance, as defined by the section within the looker.ini file')
-    parser.add_argument('--logging', '-l', help='Add console logging to help with debugging',action='store_true')
+    parser.add_argument('--instance', '-i', type=str, nargs='+', help='Name of instance, as defined by the section within the looker.ini file')
+    parser.add_argument('--environment','-e',type=str,nargs="+",choices=['production','dev'],default = 'production',help="Choose the environment to access, either production or dev")
+    parser.add_argument('--loglevel', '-l', type=str, nargs="?", help='set the logging level',default =None, choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"])
     parser.add_argument('--single', '-s', help='Run on a single instance+branch only',action='store_true')
     args = parser.parse_args()
-    # looker.ini file will have the configurations to specify the branch and project
-    config = configparser.ConfigParser()
-    config_file = "looker.ini"
-    config.read(config_file)
-    dev_branch = config[args.instance]['dev_branch']
-    project_name = config[args.instance]['project']
-    # return args.instance, dev_branch,project_name
-    return args.__dict__, dev_branch,project_name    
+    
+    # Set logging configuration
+    if args.loglevel:
+        logging.basicConfig(level=getattr(logging,args.loglevel))
+    
+    logging.info(ColorPrint.yellow + f"Args passed in: {args}" + ColorPrint.end)
+    return args.__dict__
+
+def config_instance(kwargs:dict):
+    
+    return None
+
+
 
 def config_dashboard_test(path_to_config_file,**kwargs):
     config = configparser.ConfigParser()
     file = path_to_config_file
     config.read(file)
     # Checks sections within checks config file
-    if kwargs['logging']:
-        print("Start Logging" + "." * 100)
-        print("Tests from the config file:")
-        print(config._sections)
-        print("End Logging" +  "." * 100)
     
     tests_to_run = []
     for test,run_test in config._sections['Dashboard'].items():
@@ -52,12 +54,6 @@ def config_look_test(path_to_config_file,**kwargs):
     config = configparser.ConfigParser()
     file = path_to_config_file
     config.read(file)
-    # Checks sections within checks config file
-    if kwargs['logging']:
-        print("Start Logging" + "." * 100)
-        print("Tests from the config file:")
-        print(config._sections)
-        print("End Logging" +  "." * 100)
     
     tests_to_run = []
     for test,run_test in config._sections['Look'].items():
@@ -66,11 +62,12 @@ def config_look_test(path_to_config_file,**kwargs):
     return tests_to_run
 
 def run_dashboard_tests(tests_to_run,**kwargs):
+    logging.info(ColorPrint.yellow + "Instantiating instances" + ColorPrint.end)
+    instances = []
     try:
         prod = LookerEnvironment('production',config_instance=kwargs['instance'])
-        if not kwargs['single']:
-            dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
-            dev.checkout_dev_branch(project_name,dev_branch)
+        dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
+        dev.checkout_dev_branch(project_name,dev_branch)
     except NameError: 
         print("Error in specifying the instance name, please confirm your argument matches an instance section from the looker.ini file")
     except:
@@ -134,24 +131,25 @@ def run_look_tests(tests_to_run,**kwargs):
 
 if __name__ == '__main__':
     # Set instance configs
-    kwargs, dev_branch, project_name = config_instance()
-    
-    if len(dashboard_list) > 0 and dashboard_list[0] != "":
-        # Set the configuration of tests you would like to run on your dashboard
-        dashboard_to_check = config_dashboard_test('config_tests.ini',**kwargs)
+    kwargs = setup()
+    print(kwargs)
 
-        # Run the tests
-        run_dashboard_tests(dashboard_to_check,**kwargs)
-    else:
-        print("No dashboards to test")
+    # if len(dashboard_list) > 0 and dashboard_list[0] != "":
+    #     # Set the configuration of tests you would like to run on your dashboard
+    #     dashboard_to_check = config_dashboard_test('config_tests.ini',**kwargs)
 
-    if len(look_list) > 0 and look_list[0] != "":
-        # Set the configuration of tests you would like to run on your look
-        look_to_check = config_look_test('config_tests.ini',**kwargs)
+    #     # Run the tests
+    #     run_dashboard_tests(dashboard_to_check,**kwargs)
+    # else:
+    #     print("No dashboards to test")
 
-        # Run the tests
-        run_look_tests(look_to_check,**kwargs)
-    else:
-        print("No looks to test")
+    # if len(look_list) > 0 and look_list[0] != "":
+    #     # Set the configuration of tests you would like to run on your look
+    #     look_to_check = config_look_test('config_tests.ini',**kwargs)
+
+    #     # Run the tests
+    #     run_look_tests(look_to_check,**kwargs)
+    # else:
+    #     print("No looks to test")
 
   
