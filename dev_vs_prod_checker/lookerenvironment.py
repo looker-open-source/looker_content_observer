@@ -39,7 +39,7 @@ class LookerEnvironment:
          - Updates API to call data from a specific branch
         args:
          - project_name: Looker project name
-         - project_name: Name of branch being developed on, note please commit all code prior to running this method
+         - branch_name: Name of branch being developed on, note please commit all code prior to running this method
         """
         # Step 1: Swap to Dev Mode
         self.switch_environment()
