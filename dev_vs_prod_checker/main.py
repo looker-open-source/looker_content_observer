@@ -12,10 +12,12 @@ import pandas as pd
 dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
 # dashboard_list = [""]
 # dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
-
 look_list = ["13","14"]
 
 def setup() -> dict:
+    """
+    :returns: dictionary of argparse configurations
+    """
     # Set argparse configuration, multiple instances get space delimited, see README
     parser = argparse.ArgumentParser(description='Arg to specify the instance to connect to.')
     parser.add_argument('--instance', '-i', type=str, nargs='+', help='Name of instance, as defined by the section within the looker.ini file')
@@ -46,9 +48,11 @@ def config_instances(argparse_dict:dict,looker_ini_file_path:str = "looker.ini")
             # If we are testing a dev branch from an instance, we need to first checkout the dev branch in quest
             # Note: the code tested will based on the latest committed code, please commit any code changes prior to running script
             if config_instance_environment == 'dev':
+                # The Looker project and dev branch are configured as keys within the looker.ini (or .ini equivalent file)
                 config = configparser.ConfigParser()
                 file = looker_ini_file_path
                 config.read(file)
+                logging.info(ColorPrint.yellow + f"Configuration file contains the following sections: {config._sections.keys()}" + ColorPrint.end)
                 # Checkout dev branch of the instance, dev branch specified in the looker ini file
                 instance_to_test.checkout_dev_branch(config._sections[config_instance_name]['project'],
                                                     config._sections[config_instance_name]['dev_branch'])
@@ -61,17 +65,40 @@ def config_instances(argparse_dict:dict,looker_ini_file_path:str = "looker.ini")
         instances.append(instance_to_test)
     return instances
 
-def config_dashboard_test(path_to_config_file,**kwargs):
+def config_tests(path_to_config_file:str= "config_tests.ini"):
+    # Read config.ini file which contains the individual tests which can be run
     config = configparser.ConfigParser()
     file = path_to_config_file
     config.read(file)
-    # Checks sections within checks config file
-    
-    tests_to_run = []
+    logging.info(ColorPrint.yellow + f"Test file configuration {config._sections}" + ColorPrint.end)
+
+    # Collect dashboard level tests    
+    dashboard_tests = []
     for test,run_test in config._sections['Dashboard'].items():
         if run_test.lower() == "true":
-            tests_to_run.append(test)
-    return tests_to_run
+            dashboard_tests.append(test)
+
+    # Collect look level tests
+    look_tests = []
+    for test,run_test in config._sections['Look'].items():
+        if run_test.lower() == "true":
+            look_tests.append(test)
+
+    logging.info(ColorPrint.yellow + f"Dashboards will be tested for the following: {dashboard_tests}" + ColorPrint.end)
+    logging.info(ColorPrint.yellow + f"Looks will be tested for the following: {look_tests}" + ColorPrint.end)
+    return dashboard_tests, look_tests
+
+def run_tests(dashboards_to_check:list,instances:list,dashboard_tests:list,look_tests:list=look_list):
+    for dashboard_id in dashboards_to_check:
+        dc = DashboardChecker(dashboard_id,
+                              instances,
+                              dashboard_tests)
+        dc.get_data_for_test()
+        logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {dc.test_results}" + ColorPrint.end)
+
+
+
+
 
 # def run_dashboard_tests(tests_to_run,**kwargs):
 #     for dashboard_to_test in dashboard_list:   
@@ -127,11 +154,16 @@ def run_look_tests(tests_to_run,**kwargs):
 
 if __name__ == '__main__':
     # Run setup, parses the command line arguments and stores them into a dictionary called kwargs
-    kwargs = setup()
+    args = setup()
     
     # Retrieve a list of configured instances
-    instances = config_instances(kwargs)
+    instances = config_instances(args)
 
+    # Retrieve a list of tests to run on the instances
+    dashboard_tests, look_tests = config_tests()
+
+    # Run tests
+    run_tests(dashboard_list,instances,dashboard_tests,look_tests)
 
     # if len(dashboard_list) > 0 and dashboard_list[0] != "":
     #     # Set the configuration of tests you would like to run on your dashboard
