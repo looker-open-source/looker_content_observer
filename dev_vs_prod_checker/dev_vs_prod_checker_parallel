@@ -1,0 +1,72 @@
+#!/bin/bash
+#dev_vs_prod_checker_parallel
+#For executing in parallel using parallel shell(pdsh) for executing various dashboards
+
+dashboards="950"
+#looks="3204,2310,6629,6627,6623,6628,6626,6624,6050,6686,5609,5065,5355,6264"
+looks="333,1900,2005,2082,2090,2093,2104,2163,2202,2203,2203,2221,2221,2221,2236,2236,2252,2287,2303,2332,2408,2659,2699,3081,3139,3139,3314,3315,3327,3582,3582,3784,3784,3786,3786,4090,4333,4543,4543,4543,4543,4552,4552,4587,4587,4956,4957,5290,5290,5290,5526,5547,5547,5547,5547,5547,5547,5564,5564,5855,5855,5855,6010,6010,6010,6010,6010,6120,6134,6241,6326,6349,6421,6692,6692,6710,6971,6971,6971,6972,6973,6974,7009,7191,7467,7484,7486,7657,7657,7682,7763,7763,7763,7895,7967,7967,7967,7967,7993,8029,8095,8095,8102,8109,8109,8109,8109,8135,8138,8138,8143,8249,8251,8259,8259,8259,8259,8283,8490,8569,8613,8742,8742,8742,8742,8742,8742,8791,8845,8877,8938,8996,9003,9009,9024,9104,9111,9157,9218,9219,9280,9331,9356,9365,9365,9393,9393,9393,9393,9393,9422,9478,9499,9499,9500,9502,9502,9503,9504,9504,9513,9514,9514,9515,9516,9517,9518,9522,9522,9524,9525,9529,9535,9536,9563,9566,9580,9581,9584,9585,9586,9593,9593,9595,9601,9601,9602,9602,9603,9604,9605,9606,9607,9608,9609,9610,9611,9612,9613,9614,9615,9616,9621,9627,9627,9628,9630,9634,9635,9636,9637,9638,9640,9641,9655,9656,9657,9663,9664,9665,9666,9667,9668,9669,9671,9671,9672"
+runfolder="dev_vs_prod_checker"
+logfolder="logs"
+
+cd $runfolder
+if [ ! -d "$logfolder" ]; then
+   mkdir $logfolder
+fi
+
+IFS=","
+for i in $dashboards; do
+  #echo $i  
+  grep -i "Outputting Dashboard Level Tests" $logfolder/dashboard-$i.result > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Dashboard $i - Could not find valid test result output, running query test.."
+    cp main-template.py main.py
+    sed -i "s/\$DASHBOARD_ID/$i/g" main.py
+    sed -i "s/\$LOOK_ID//g" main.py
+    python3 -u main.py -i venmoQA -s > $logfolder/dashboard-$i.result &
+    sleep 10 
+  else
+    echo "Dashboard $i - checking for errors in queries.." 
+    input="$logfolder/dashboard-$i.result"
+    while IFS= read -r line
+    do
+      echo "$line" | grep -i "Checking tile number" 
+      echo "$line" | grep -i "Result" 
+    done < "$input" 
+  fi 
+done
+
+echo "====================================================================================================================="
+IFS=","
+for i in $looks; do
+  echo "LOOK ID#=$i"  
+  grep -i "Success (Look)" $logfolder/look-$i.result > /dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    echo "Look $i - Could not find valid look test result, running query test.."
+    cp main-template.py main.py
+    sed -i "s/\$DASHBOARD_ID//g" main.py
+    sed -i "s/\$LOOK_ID/$i/g" main.py
+    python3 -u main.py -i venmoQA -s > $logfolder/look-$i.result &
+    sleep 10 
+  else
+    echo "Look $i - checking for errors in queries.." 
+    input="$logfolder/look-$i.result"
+    while IFS= read -r line
+    do
+      #echo $line
+      echo "$line" | grep -i "Checking tile number" 
+      echo "$line" | grep -i "Result" 
+      #grep -i "Result:" $line
+    done < "$input" 
+  fi 
+done
+
+
+#Runs the result query checker for dashboards that don't return result
+#IFS=","
+#for i in $dashboards; do
+#  echo $i 
+#  cp main-template.py main.py
+#  sed -i "s/\$DASHBOARD_ID/$i/g" main.py
+#  python3 -u main.py -i venmoQA -s > $logfolder/dashboard-$i.result &
+#  sleep 5 
+#done
