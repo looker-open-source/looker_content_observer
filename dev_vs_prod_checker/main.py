@@ -93,9 +93,9 @@ def run_tests(dashboards_to_check:list,instances:list,dashboard_tests:list,look_
         dc = DashboardChecker(dashboard_id,
                               instances,
                               dashboard_tests)
-        dc.get_data_for_test()
-        logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {dc.test_results}" + ColorPrint.end)
-
+        data = dc.get_data_for_test()
+        logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {data}" + ColorPrint.end)
+        print(pd.DataFrame(data))
 
 
 
