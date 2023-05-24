@@ -6,6 +6,7 @@ from lookcheckersingle import LookCheckerSingle
 import logging
 import configparser
 import argparse
+import yaml
 from colorprint import ColorPrint
 import pandas as pd
 
@@ -65,93 +66,32 @@ def config_instances(argparse_dict:dict,looker_ini_file_path:str = "looker.ini")
         instances.append(instance_to_test)
     return instances
 
-def config_tests(path_to_config_file:str= "config_tests.ini"):
-    # Read config.ini file which contains the individual tests which can be run
-    config = configparser.ConfigParser()
-    file = path_to_config_file
-    config.read(file)
-    logging.info(ColorPrint.yellow + f"Test file configuration {config._sections}" + ColorPrint.end)
+def config_tests_yaml(path_to_yaml_config_file:str="config_tests.yaml"):
+    try:
+        with open(path_to_yaml_config_file, 'r') as file:
+            tests = yaml.safe_load(file)
+    except:
+        logging.error("Error reading YAML File")
 
-    # Collect dashboard level tests    
-    dashboard_tests = []
-    for test,run_test in config._sections['Dashboard'].items():
-        if run_test.lower() == "true":
-            dashboard_tests.append(test)
+    logging.info(ColorPrint.yellow + f"Test file configuration {tests}" + ColorPrint.end)
+    return tests
 
-    # Collect look level tests
-    look_tests = []
-    for test,run_test in config._sections['Look'].items():
-        if run_test.lower() == "true":
-            look_tests.append(test)
+def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict):
+    dash_data = []
+    assert tests_to_run.get('dashboard_tests') is not None, f"No key found for dashboard tests, please confirm the config_tests.yaml file is being passed in"
 
-    logging.info(ColorPrint.yellow + f"Dashboards will be tested for the following: {dashboard_tests}" + ColorPrint.end)
-    logging.info(ColorPrint.yellow + f"Looks will be tested for the following: {look_tests}" + ColorPrint.end)
-    return dashboard_tests, look_tests
-
-def run_tests(dashboards_to_check:list,instances:list,dashboard_tests:list,look_tests:list=look_list):
     for dashboard_id in dashboards_to_check:
         dc = DashboardChecker(dashboard_id,
                               instances,
-                              dashboard_tests)
+                              tests_to_run['dashboard_tests'])
         data = dc.get_data_for_test()
         logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {data}" + ColorPrint.end)
-        print(pd.DataFrame(data))
+        df=pd.DataFrame(data,columns = ["name_of_dashboard","instance_environment","test","level","tile_pkey","test_result"])
+        print(df)
+        dash_data.append(df)
+    return dash_data
 
-
-
-
-# def run_dashboard_tests(tests_to_run,**kwargs):
-#     for dashboard_to_test in dashboard_list:   
-#         if kwargs['single']:
-#             dc = DashboardCheckerSingle(dashboard_to_test,kwargs,instances[0],tests_to_run)
-#             dc.run_tests()
-#             dc.output_tests()
-
-#         else:
-#             dc = DashboardChecker(dashboard_to_test,kwargs,*instances,tests_to_run)
-                
-#             # to do: create a dc.run_tests method
-#             # Step 1: Run the tests
-#             dc.run_tests()
-
-#             # Step 2: Log and print out the outputs
-#             dc.output_tests()
-
-#             # Step 3: Output a dataframe we can turn into a CSV
-#             # print("\n\n\n\nTo do: Output this a dataframe so users can save to csv")
-#             # print(ColorPrint.cyan+"You can also print the tests as a dataframe:"+ColorPrint.end)
-
-#             # df = pd.DataFrame(dc.test_results)
-#             # print(df)
-
-
-def run_look_tests(tests_to_run,**kwargs):
-    try:
-        prod = LookerEnvironment('production',config_instance=kwargs['instance'])
-        if not kwargs['single']:
-            dev = LookerEnvironment('dev',config_instance=kwargs['instance'])
-            dev.checkout_dev_branch(project_name,dev_branch)
-    except NameError: 
-        print("Error in specifying the instance name, please confirm your argument matches an instance section from the looker.ini file")
-    except:
-        print("Error in setting the instance configurations")
-
-    if kwargs['single']:
-        instances= [prod]
-    else:
-        instances = [prod,dev]  
-
-    for look_to_test in look_list:   
-        if kwargs['single']:
-            lc = LookCheckerSingle(look_to_test,kwargs,instances[0],tests_to_run)
-            lc.run_tests()
-            lc.output_tests()
-
-        else:
-            print("Look comparison is under construction, use -s arg to check single")
     
-
-
 if __name__ == '__main__':
     # Run setup, parses the command line arguments and stores them into a dictionary called kwargs
     args = setup()
@@ -160,27 +100,10 @@ if __name__ == '__main__':
     instances = config_instances(args)
 
     # Retrieve a list of tests to run on the instances
-    dashboard_tests, look_tests = config_tests()
+    # dashboard_tests, look_tests = config_tests()
+    tests_to_run = config_tests_yaml()
 
     # Run tests
-    run_tests(dashboard_list,instances,dashboard_tests,look_tests)
-
-    # if len(dashboard_list) > 0 and dashboard_list[0] != "":
-    #     # Set the configuration of tests you would like to run on your dashboard
-    #     dashboard_to_check = config_dashboard_test('config_tests.ini',**kwargs)
-
-    #     # Run the tests
-    #     run_dashboard_tests(dashboard_to_check,**kwargs)
-    # else:
-    #     print("No dashboards to test")
-
-    # if len(look_list) > 0 and look_list[0] != "":
-    #     # Set the configuration of tests you would like to run on your look
-    #     look_to_check = config_look_test('config_tests.ini',**kwargs)
-
-    #     # Run the tests
-    #     run_look_tests(look_to_check,**kwargs)
-    # else:
-    #     print("No looks to test")
+    run_dashboard_tests(dashboard_list,instances,tests_to_run)
 
   

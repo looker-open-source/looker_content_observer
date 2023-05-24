@@ -1,43 +1,67 @@
 from dashboard import Dashboard
 from colorprint import ColorPrint
 from test import Test
+from tile import Tile
+import logging
 import pandas
-class DashboardChecker(Dashboard):
-    def __init__(self, dashboard_id,kwargs,instance_1:object,instance_2:object, tests_to_run:list) -> None:
-        super().__init__(dashboard_id,kwargs)
-        self.test_results = []
-        self.instance_1 = instance_1
-        self.instance_2 = instance_2
-        self.instances = [self.instance_1,self.instance_2]
-        self.tests_to_run = tests_to_run
-        self.api_methods = ['get_tile_data']
-    
-    def run_tests(self) -> None:
-        """
-        :overview:
-        - Runs a Test (from the Test class) on a dashboard between instances
-        - Stores the test result within the self.test_results parameter
 
-        :returns: 
-        - None
+class DashboardChecker(Dashboard):
+    def __init__(self, dashboard_id:str,instances:list,tests_to_run:dict) -> None:
+        super().__init__(dashboard_id)
+        self.test_results = [] # List of dictionary items
+        self.instances = instances
+        # Contains both dashboard level and tile level tests
+        self.tests_to_run = tests_to_run
+        self.dashboard_level_tests:list = list(filter(lambda run_test: self.tests_to_run['dashboard_level'][run_test] == True,self.tests_to_run['dashboard_level'])) 
+        self.tile_level_tests:list = list(filter(lambda run_test: self.tests_to_run['tile_level'][run_test] == True,self.tests_to_run['tile_level']))
+    
+    def get_data_for_test(self) -> dict:
         """
+        - Method largely makes API calls to retrive data to be later used in testing + comparisons
+        - Certain methods require multiple API calls, these are specified in the self.api_methods
+        - Data is formatted as a dictionary and then appended to self.test_results
+        - :returns: dictionary
+        """
+        output = []
         for instance in self.instances:
+            logging.info(ColorPrint.yellow + f"Runnings tests on following instances: {instance.config_instance}" + ColorPrint.end)
             dash = self.get_dashboard(instance.sdk)
-            for method_to_test in self.tests_to_run:
-                output = {}
-                output['instance_environment'] = instance.config_instance + "." + instance.environment # Output: LookerUAT.production or LookerProd.dev 
-                output['dashboard_title'] = dash.title # Dashboard Title
-                print("Testing Dashboard " + dash.id + ": " + dash.title + " - on " + output['instance_environment'])
-                
-                if method_to_test in self.api_methods: # Certain methods will need to make an additional API call
-                    output[method_to_test] = getattr(Test,method_to_test)(dash,instance.sdk)
-                    if self.kwargs['logging']:
-                        print("Start Logging" + "." * 100)
-                        print("Checking the number of length of the output dict:",len(output[method_to_test]), f"for following test:{method_to_test}")
-                        print("End Logging" +  "." * 100)
-                else:
-                    output[method_to_test] = getattr(Test,method_to_test)(dash)
-                self.test_results.append(output)
+            instance_environment = instance.config_instance + "." + instance.environment
+            # Run dashboard level tests
+            for method_to_test in self.dashboard_level_tests:
+                logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
+                # Check if test is set to true
+                result_from_test = getattr(Test,method_to_test)(dash)
+                output.append([dash.title,instance_environment,method_to_test,"dashboard",None,result_from_test])    
+                # # if key exists
+                # if output.get(instance_environment):
+                #     output[instance_environment].append(result_from_test)
+                # else:
+                #     output[instance_environment] = [result_from_test]
+
+            # Run tile level tests
+            logging.info(ColorPrint.yellow + f"Runnings tile level tests: {self.tile_level_tests}" + ColorPrint.end)
+            for element in dash.dashboard_elements:
+                t = Tile(element,dash.dashboard_layouts)
+                for tile_method_to_test in self.tile_level_tests:
+                    # Check if test is set to true
+                    result_from_test = getattr(Test,tile_method_to_test)(t)
+                    logging.debug(ColorPrint.blue + f"Result from test: {result_from_test} for test-{tile_method_to_test}" + ColorPrint.end)
+                    # if key exists
+                    output.append([dash.title,instance_environment,tile_method_to_test,"tile",t.tile_pkey,result_from_test])     
+
+                    # if output.get(instance_environment):
+                    #     output[instance_environment].append(result_from_test)
+                    # else:
+                    #     output[instance_environment] = [result_from_test]
+
+
+        # keyorder = ["dash_name","tests"] + [instance.config_instance + "." + instance.environment for instance in self.instances]
+        # logging.info(ColorPrint.blue + f"Sort order of the output is: {keyorder}" + ColorPrint.end)
+        # output["tests"] = [self.dashboard_level_tests] + [self.tile_level_tests]
+        # output["dash_name"] = [dash.title] * len(output["tests"]) 
+        # sorted_output = {k: output[k] for k in keyorder if k in output} # Custom ordering, works on Python >3.6
+        return output 
 
     def output_tests(self) -> pandas.DataFrame:
         """
