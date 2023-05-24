@@ -2,8 +2,6 @@ import pandas as pd
 from colorprint import ColorPrint
 import json
 import logging
-import looker_sdk
-
 
 class Tile: 
     def __init__(self,tile, dashboard_layout:list[object]) -> None:
@@ -18,7 +16,7 @@ class Tile:
         self.tile_df_dimensions:tuple(int) = None
         self.tile_merged_dfs:list[pd.DataFrame] = []
         self.tile_merged_dfs_dimensions:list[pd.DataFrame] = []
-        self.tile_data_retrieval_error:bool = False
+        self.tile_data_error:bool = False
 
     def get_name_of_tile(self):
         """
@@ -118,7 +116,7 @@ class Tile:
                 logging.error("Error running following tile:",self.tile_pkey)
                 self.tile_data_error = True
         else:
-            logging.debug(ColorPrint.blue + f"Tile: {self.tile_pkey} skipped as not of type 'vis'" + ColorPrint.end)
+            logging.debug(ColorPrint.blue + f"Tile: {self.tile_pkey} skipped asnot of type 'vis'" + ColorPrint.end)
 
 
 

@@ -1,21 +1,25 @@
 import pandas as pd
 from dashboard import Dashboard
+from tile import Tile
+import logging
+from colorprint import ColorPrint
 import json
 
-class Test:
+class EqualityTests:
     def is_equal(a,b) -> bool:
         return a == b
     
     def is_dataframe_equal(a:pd.DataFrame,b:pd.DataFrame) -> bool:
         return a.equals(b)
-    
-    def get_number_tiles_in_dash(dash):
+
+class Test:    
+    def get_number_tiles_in_dash(dash:Dashboard):
         return len(dash.dashboard_elements)
     
-    def get_number_filters_in_dash(dash):
+    def get_number_filters_in_dash(dash:Dashboard):
         return len(dash.dashboard_filters)
     
-    def get_hash_of_all_filters(dash):
+    def get_hash_of_all_filters(dash:Dashboard):
         """
         overview: 
         - Each dashboard element is an object, this method converts the object into a string and then hashes the string and is used in a check to compare hashes
@@ -25,7 +29,7 @@ class Test:
         """
         return hash(frozenset([str(val) for val in sorted(dash.dashboard_filters, key= lambda obj: obj.id)]))
 
-    def get_type_of_dashboard(dash):
+    def get_type_of_dashboard(dash:Dashboard):
         # UDD - User defined dashboard
         return 'LookML Dashboard' if dash.lookml_link_id else 'UDD'
     
@@ -36,7 +40,7 @@ class Test:
             # print(dash_element)
         return None
     
-    def get_composition_of_dashboard(dash):
+    def get_composition_of_dashboard(dash:Dashboard):
         """
         overview: 
         - Tests if a dashboard has the same number of elements by the type of dashboard visualization
@@ -51,35 +55,58 @@ class Test:
                 composition[dash_element.type] += 1
         # Sort by keys
         return sorted(composition.items())
-
-    def get_name_of_tile(tile):
-        if tile.type == 'button':
-            try:
-                return json.loads(tile.rich_content_json)['text']
-            except: 
-                return "Error with parsing JSON of button"
-        elif tile.type == 'text':
-            return tile.title_text_as_html
-        elif tile.type == 'vis':
-            return tile.title
-        else:
-            return "Unmapped"
-
-    def get_tile_names(dash):
+    
+    # TODO: Debug this
+    def get_tile_names(dash:Dashboard):
         composition = {}
         for tile in dash.dashboard_elements:
-            name_of_tile = Test.get_name_of_tile(tile)
-            if name_of_tile == None or name_of_tile == '':
-                name_of_tile = "None"
-            if name_of_tile not in composition:
-                composition[name_of_tile] = 1
+            t = Tile(tile,dash)
+            logging.debug(ColorPrint.blue + f"Checking tile:{t.tile_name}" + ColorPrint.end)
+            if t.tile_name not in composition:
+                composition[t.tile_name] = 1
             else:
-                composition[name_of_tile] += 1
+                composition[t.tile_name] += 1
         # Sort by keys
-        # print(composition)
         return sorted(composition.items())
+
+    def get_tile_data(tile:Tile):
+        if tile.tile_type == "Merged Query":
+            return tile.tile_merged_dfs
+        else:
+            return tile.tile_df
+
+    def get_tile_dimensions(tile:Tile):
+        if tile.tile_type == "Merged Query":
+            return tile.tile_merged_dfs_dimensions
+        else:
+            return tile.tile_df_dimensions
+
+    def get_tile_position(tile:Tile):
+        return tile.tile_layout
+
+    def get_api_success(tile:Tile):
+        if tile.tile_data_error:
+            return False
+        else:
+            return True
+
+
+#    def get_name_of_tile(tile):
+        # if tile.type == 'button':
+        #     try:
+        #         return json.loads(tile.rich_content_json)['text']
+        #     except: 
+        #         return "Error with parsing JSON of button"
+        # elif tile.type == 'text':
+        #     return tile.title_text_as_html
+        # elif tile.type == 'vis':
+        #     return tile.title
+        # else:
+        #     return "Unmapped"
+
+
     
-    def get_tile_data(dash,sdk:object):
+#    def get_tile_data(dash,sdk:object):
         dfs = []
         test2 = []
         merge_list = []
