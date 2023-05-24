@@ -11,6 +11,9 @@ class Dashboard:
         """ 
         return sdk.dashboard(self.dashboard_id)
 
+    def get_dashboard_layout(self,sdk:object) -> list: 
+        return sdk.dashboard_dashboard_layouts(self.dashboard_id)
+
     def get_all_dashboard_elements(self, sdk:object) -> list:
         """
         :returns: All tile infromation from a dashboard (based on the dashboard id)
