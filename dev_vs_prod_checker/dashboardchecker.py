@@ -2,6 +2,7 @@ from dashboard import Dashboard
 from colorprint import ColorPrint
 from test import Test
 from tile import Tile
+import pandas as pd
 import logging
 import pandas
 
@@ -22,8 +23,9 @@ class DashboardChecker(Dashboard):
         - Data is formatted as a dictionary and then appended to self.test_results
         - :returns: dictionary
         """
-        output = []
+        instance_dfs = []
         for instance in self.instances:
+            output = []
             logging.info(ColorPrint.yellow + f"Runnings tests on following instances: {instance.config_instance}" + ColorPrint.end)
             dash = self.get_dashboard(instance.sdk)
             instance_environment = instance.config_instance + "." + instance.environment
@@ -32,7 +34,7 @@ class DashboardChecker(Dashboard):
                 logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
                 # Check if test is set to true
                 result_from_test = getattr(Test,method_to_test)(dash)
-                output.append([dash.title,instance_environment,method_to_test,"dashboard",None,result_from_test])    
+                output.append([instance_environment,dash.title,"dashboard",method_to_test,result_from_test])  
                 # # if key exists
                 # if output.get(instance_environment):
                 #     output[instance_environment].append(result_from_test)
@@ -48,12 +50,8 @@ class DashboardChecker(Dashboard):
                     result_from_test = getattr(Test,tile_method_to_test)(t)
                     logging.debug(ColorPrint.blue + f"Result from test: {result_from_test} for test-{tile_method_to_test}" + ColorPrint.end)
                     # if key exists
-                    output.append([dash.title,instance_environment,tile_method_to_test,"tile",t.tile_pkey,result_from_test])     
-
-                    # if output.get(instance_environment):
-                    #     output[instance_environment].append(result_from_test)
-                    # else:
-                    #     output[instance_environment] = [result_from_test]
+                    output.append([instance_environment,dash.title,f"tile-{t.tile_pkey}",tile_method_to_test,result_from_test])     
+            instance_dfs.append(pd.DataFrame(output,columns =['instance_environment','dashboard_title','level','test','test_result']))
 
 
         # keyorder = ["dash_name","tests"] + [instance.config_instance + "." + instance.environment for instance in self.instances]
@@ -61,7 +59,7 @@ class DashboardChecker(Dashboard):
         # output["tests"] = [self.dashboard_level_tests] + [self.tile_level_tests]
         # output["dash_name"] = [dash.title] * len(output["tests"]) 
         # sorted_output = {k: output[k] for k in keyorder if k in output} # Custom ordering, works on Python >3.6
-        return output 
+        return instance_dfs 
 
     def output_tests(self) -> pandas.DataFrame:
         """

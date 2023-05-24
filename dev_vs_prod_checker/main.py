@@ -86,9 +86,7 @@ def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dic
                               tests_to_run['dashboard_tests'])
         data = dc.get_data_for_test()
         logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {data}" + ColorPrint.end)
-        df=pd.DataFrame(data,columns = ["name_of_dashboard","instance_environment","test","level","tile_pkey","test_result"])
-        print(df)
-        dash_data.append(df)
+        dash_data.append(data)
     return dash_data
 
     
