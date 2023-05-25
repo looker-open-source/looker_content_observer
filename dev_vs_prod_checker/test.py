@@ -78,7 +78,7 @@ class Test:
                 assert tile.tile_df is not None
                 return pd.util.hash_pandas_object(tile.tile_df).sum()
         except AssertionError:
-            logging.warning(ColorPrint.blue + "Tile Contained no data, returning 0" + ColorPrint.end)
+            logging.warning(ColorPrint.yellow + f"{tile.tile_name} contained no data" + ColorPrint.end)
             return 0
 
     def get_tile_dimensions(tile:Tile):

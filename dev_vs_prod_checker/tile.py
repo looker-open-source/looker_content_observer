@@ -96,7 +96,7 @@ class Tile:
                 self.tile_df = df.astype(str)
                 self.tile_df_dimensions = df.shape
             except AssertionError:
-                logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile" + ColorPrint.end)
+                logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for {self.tile_name}" + ColorPrint.end)
                 self.tile_data_error = True
                 self.looker_error_sdk_message = df.values[0][0]
             except:

@@ -125,9 +125,10 @@ if __name__ == '__main__':
         print(ColorPrint.red + "Error on following test:" + ColorPrint.end)
         print(row,"\n")
 
+    # Logging cases where there was an individual tile API error
     for key,row in combined_dataframe["get_api_success" == combined_dataframe['test']].iterrows():
         # Check if any of the values have the failure key of "failed -" for logging
-        if any("failed -" in val for val in row.values):                
+        if any("failed -" in str(val) for val in list(row)):                
             print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
             print(row,"\n")
 
