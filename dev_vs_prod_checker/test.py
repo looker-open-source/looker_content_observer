@@ -5,12 +5,21 @@ import logging
 from colorprint import ColorPrint
 import json
 
-class EqualityTests:
-    def is_equal(a,b) -> bool:
-        return a == b
-    
+class TestResult:
+ 
     def is_dataframe_equal(a:pd.DataFrame,b:pd.DataFrame) -> bool:
         return a.equals(b)
+    
+    def is_data_equal(df:pd.DataFrame) -> bool:
+        """
+        - Find where the column == 'test', all columns to the right of this will be the ones we want to test 
+        """
+        test_index = (df.columns.get_loc("test") + 1)
+        try:
+            assert (df.shape[1] - test_index) > 1, f"Test only as one row"
+            return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , df.iloc[:,test_index:].values))
+        except AssertionError:
+            return ['N/A'] * df.shape[0]      
 
 class Test:    
     def get_number_tiles_in_dash(dash:Dashboard):
@@ -89,127 +98,3 @@ class Test:
             return False
         else:
             return True
-
-
-#    def get_name_of_tile(tile):
-        # if tile.type == 'button':
-        #     try:
-        #         return json.loads(tile.rich_content_json)['text']
-        #     except: 
-        #         return "Error with parsing JSON of button"
-        # elif tile.type == 'text':
-        #     return tile.title_text_as_html
-        # elif tile.type == 'vis':
-        #     return tile.title
-        # else:
-        #     return "Unmapped"
-
-
-    
-#    def get_tile_data(dash,sdk:object):
-        dfs = []
-        test2 = []
-        merge_list = []
-        composition = {}
-        for tile in dash.dashboard_elements:
-            name_of_tile = Test.get_name_of_tile(tile)
-            if name_of_tile == None or name_of_tile == '':
-                name_of_tile = "None"
-            if name_of_tile not in composition:
-                composition[name_of_tile] = 1
-            else:
-                composition[name_of_tile] += 1
-            # print("Checking............................",Test.get_name_of_tile(tile))
-            # print("Type of Tile.........................",tile.type)
-            if tile.type == 'vis' or tile.type == 'looker_map':
-                if tile.result_maker.query_id is not None: #most vis have a query ID, if they do not it is likely a merge query
-                    # Not using tile.query_id since that does not work on lookml dashboards
-                    # result_maker_list.append(tile.result_maker)
-                    # print("Length of result maker is",len(tile.result_maker))
-                    # for result_maker in result_maker_list:
-                    # print("QueryID from result maker is",tile.result_maker.query_id)
-                    failed_to_get_data = False                
-                    if tile.look_id == None: 
-                        # print(tile.title)
-                        # print(tile.result_maker.query_id)
-                        # print(tile.id)
-                        # querydef = sdk.dashboard_element(dashboard_element_id=tile.id,fields="query(model,view,fields,pivots,fill_fields,filters,filter_expression,sorts,limit,column_limit,total,row_total,subtotals,vis_config,filter_config,visible_ui_sections,dynamic_fields,query_timezone)")
-                        # print(querydef.query)
-                        # df = pd.read_json(sdk.run_inline_query(result_format='json',body = querydef.query))
-                        # print(df)
-                        try:
-                            df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
-                            pd.set_option("display.max_colwidth", 1000) # TODO: not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
-                            output = {'df':df,
-                                "query_id":tile.result_maker.query_id,
-                                "is_empty": df.empty,
-                                "shape":df.shape,
-                                "tile_title":tile.title, 
-                                "could_get_api_data":failed_to_get_data}
-                            dfs.append(output)
-                            print("Success (Normal query tile)")
-                        except:
-                            print("Failed to get data from normal query tile")
-                            failed_to_get_data = True
-                            output = {'df':None,
-                                "query_id":tile.result_maker.query_id,
-                                "is_empty": None,
-                                "shape":None,
-                                "tile_title":tile.title, 
-                                "could_get_api_data":failed_to_get_data}
-                            dfs.append(output)
-                    elif tile.look_id is not None: 
-                        print(tile.look.title)
-                        print(tile.look.query.id)
-                        df = pd.read_json(sdk.run_query(query_id=tile.look.query.id,result_format='json'))
-                        pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
-                        output = {'df':df,
-                            "query_id":tile.look.query.id,
-                            "is_empty": df.empty,
-                            "shape":df.shape,
-                            "tile_title":tile.look.title, 
-                            "could_get_api_data":failed_to_get_data}
-                        dfs.append(output)
-                        print("Success (Look tile)")
-                    else:
-                        failed_to_get_data = True
-                        print("Failed to get data from look tile")
-                        output = {'df':None,
-                            "query_id":tile.look.query.id,
-                            "is_empty": None,
-                            "shape":None,
-                            "tile_title":tile.look.title, 
-                            "could_get_api_data":failed_to_get_data}
-                        dfs.append(output)
-                    
-                elif tile.merge_result_id is not None: #handle a merge query
-                    try:
-                        merge_list = sdk.merge_query(tile.merge_result_id)
-                        for source_query in merge_list.source_queries:
-                            try: 
-                                df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
-                                output = {'df':df,
-                                    "query_id":source_query.query_id,
-                                    "is_empty": df.empty,
-                                    "shape":df.shape,
-                                    "tile_title":tile.title, 
-                                    "could_get_api_data":failed_to_get_data}
-                                dfs.append(output)
-                                print("Success (Merged query)")
-                            except:
-                                print("Failed to get data from merged query")
-                                failed_to_get_data = True
-                                output = {'df':None,
-                                    "query_id":source_query.query_id,
-                                    "is_empty": None,
-                                    "shape":None,
-                                    "tile_title":tile.title, 
-                                    "could_get_api_data":failed_to_get_data}
-                                dfs.append(output)
-                    except:
-                        print("Fail to identify merged ID")
-                        failed_to_get_data = True
-                else:
-                    failed_to_get_data = True
-                    print("Fail to get data Fail Fail")
-        return dfs

@@ -12,3 +12,4 @@ demo_data/__pycache__/*
 demo_data/config.yml
 dev_vs_prod_checker/testtile.py
 dev_vs_prod_checker/*.csv
+.DS_Store

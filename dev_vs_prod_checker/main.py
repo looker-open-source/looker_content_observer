@@ -1,12 +1,8 @@
 from lookerenvironment import LookerEnvironment
 from dashboard import Dashboard
 from dashboardchecker import DashboardChecker
-from dashboardcheckersingle import DashboardCheckerSingle
-from lookcheckersingle import LookCheckerSingle
-import logging
-import configparser
-import argparse
-import yaml
+from test import TestResult
+import logging,configparser,argparse,yaml
 from colorprint import ColorPrint
 import pandas as pd
 
@@ -17,6 +13,7 @@ look_list = ["13","14"]
 
 def setup() -> dict:
     """
+    Parses command line arguments and sets up logging.
     :returns: dictionary of argparse configurations
     """
     # Set argparse configuration, multiple instances get space delimited, see README
@@ -37,9 +34,11 @@ def setup() -> dict:
 
 def config_instances(argparse_dict:dict,looker_ini_file_path:str = "looker.ini") -> list:
     """
+    - Reads API configuration for each instance, specific dev branch is specified in the looker.ini file (or looker.ini file equivalent)  
     :returns: list of instances to be tested
     """
     logging.info(ColorPrint.yellow + "Instantiating instances" + ColorPrint.end)
+    # Append each instance as LookerEnvironment class to list
     instances = []
 
     for instance_index in range(len(argparse_dict.get('instance'))):
@@ -68,6 +67,10 @@ def config_instances(argparse_dict:dict,looker_ini_file_path:str = "looker.ini")
     return instances
 
 def config_tests_yaml(path_to_yaml_config_file:str="config_tests.yaml"):
+    """
+    - Reads in the tests specified within the "config_tests.yaml" file (or equivalent)
+    :returns: list of tests read in from the config_file_yaml
+    """
     try:
         with open(path_to_yaml_config_file, 'r') as file:
             tests = yaml.safe_load(file)
@@ -77,7 +80,11 @@ def config_tests_yaml(path_to_yaml_config_file:str="config_tests.yaml"):
     logging.info(ColorPrint.yellow + f"Test file configuration {tests}" + ColorPrint.end)
     return tests
 
-def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict) -> tuple:
+def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict) -> tuple[pd.DataFrame]:
+    """
+    - Retrieves data for each test 
+    :returns: each dashboard as element within list, all dashboards combined into a single pandas dataframe 
+    """
     dash_data = []
     assert tests_to_run.get('dashboard_tests') is not None, f"No key found for dashboard tests, please confirm the config_tests.yaml file is being passed in"
 
@@ -86,7 +93,10 @@ def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dic
                               instances,
                               tests_to_run['dashboard_tests'])
         data = dc.get_data_for_test()
-        logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {data}" + ColorPrint.end)
+        logging.info(ColorPrint.yellow + f"Retrieved data for dash:{dashboard_id} of shape:{data.shape}" + ColorPrint.end)
+        logging.info(ColorPrint.yellow + f"Applying pandas tests to data" + ColorPrint.end)
+        # Apply test of equality
+        data['is_data_equal'] = TestResult.is_data_equal(data)
         dash_data.append(data)
     
     return dash_data, pd.concat([*dash_data], ignore_index=True)
@@ -94,18 +104,28 @@ def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dic
     
 if __name__ == '__main__':
     # Run setup, parses the command line arguments and stores them into a dictionary called kwargs
+    print("Parsing command line arguments:")
     args = setup()
     
+    print("Configuring list of instances to test:")
     # Retrieve a list of configured instances
     instances = config_instances(args)
 
+    print("Configuring list of tests to run:")
     # Retrieve a list of tests to run on the instances
-    # dashboard_tests, look_tests = config_tests()
     tests_to_run = config_tests_yaml()
 
+    print("Runnig Tests")
     # Run tests
     per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(dashboard_list,instances,tests_to_run)
+    logging.info(ColorPrint.yellow + f"Combined DataFrame:\n{combined_dataframe}" + ColorPrint.end)
+
+    # Logging Errors on rows where the data is not equal between columns
+    for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == False].iterrows():
+        print(ColorPrint.red + "Error on following test:" + ColorPrint.end)
+        print(row,"\n")
     
+    # If optional arg for csv, create a CSV file
     if args.get('csv'):
         combined_dataframe.to_csv(args.get('csv'))
 
