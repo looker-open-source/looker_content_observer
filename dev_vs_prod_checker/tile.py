@@ -71,8 +71,14 @@ class Tile:
         :returns: row, column, width, height coordinates for the tile's position within the dashboard
         """
         layouts = self.dashboard_layout
-        logging.debug(ColorPrint.blue + f"Keys within layout are:{layouts[0].__dict__.keys()}" + ColorPrint.end)
-        filter_for_tile = list(filter(lambda layouts : layouts['id'] == self.get_tile_id(),layouts[0].dashboard_layout_components ))        
+        logging.debug(ColorPrint.blue + f"Number of dictionaries returned by sdk.dashboard_dashboard_layouts: {len(layouts)}" + ColorPrint.end)
+        dashboard_type = list(filter(lambda layouts : layouts['type'] != "drag",layouts ))        
+        logging.debug(ColorPrint.blue + f"Dashboard is of type:{dashboard_type[0].type}" + ColorPrint.end)
+        logging.debug(ColorPrint.blue + f"Length of dashboard_type:{len(dashboard_type)}" + ColorPrint.end)
+        assert len(dashboard_type) == 1, f"Dashboard has more than 1 type within it" 
+
+        logging.debug(ColorPrint.blue + f"Tile ID:{self.get_tile_id()}" + ColorPrint.end)
+        filter_for_tile = list(filter(lambda dash_id : dash_id['dashboard_element_id'] == self.get_tile_id(),dashboard_type[0].dashboard_layout_components ))        
         logging.debug(ColorPrint.blue + f"Filtered tile:{filter_for_tile}" + ColorPrint.end)
 
         # Raise an error in the cases that filter expresison finds more than 1 dashboard with same element_id
