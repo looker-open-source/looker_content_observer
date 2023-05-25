@@ -68,17 +68,16 @@ class Test:
         return sorted(composition.items())
     
     # TODO: Debug this
-    def get_tile_names(dash:Dashboard):
-        composition = {}
-        for tile in dash.dashboard_elements:
-            t = Tile(tile,dash)
-            logging.debug(ColorPrint.blue + f"Checking tile:{t.tile_name}" + ColorPrint.end)
-            if t.tile_name not in composition:
-                composition[t.tile_name] = 1
-            else:
-                composition[t.tile_name] += 1
-        # Sort by keys
-        return sorted(composition.items())
+    # def get_tile_names(tile:Tile):
+    #     composition = {}
+    #     for tile in dash.dashboard_elements:
+    #         logging.debug(ColorPrint.blue + f"Checking tile:{t.tile_name}" + ColorPrint.end)
+    #         if t.tile_name not in composition:
+    #             composition[t.tile_name] = 1
+    #         else:
+    #             composition[t.tile_name] += 1
+    #     # Sort by keys
+    #     return sorted(composition.items())
 
     def get_tile_data(tile:Tile):
         logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
