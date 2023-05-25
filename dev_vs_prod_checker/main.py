@@ -10,7 +10,7 @@ import yaml
 from colorprint import ColorPrint
 import pandas as pd
 
-dashboard_list = ["jhu_covid::jhu_base_template_extend","2"]
+dashboard_list = ["jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
 # dashboard_list = [""]
 # dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
 look_list = ["13","14"]

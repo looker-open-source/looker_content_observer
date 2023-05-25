@@ -11,4 +11,4 @@ dev_vs_prod_testing/text3.txt
 demo_data/__pycache__/*
 demo_data/config.yml
 dev_vs_prod_checker/testtile.py
-dev_vs_prod_checker/test.csv
+dev_vs_prod_checker/*.csv
