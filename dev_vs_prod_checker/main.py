@@ -25,6 +25,7 @@ def setup() -> dict:
     parser.add_argument('--environment','-e',type=str,nargs="+",choices=['production','dev'],default = 'production',help="Choose the environment to access, either production or dev")
     parser.add_argument('--loglevel', '-l', type=str, nargs="?", help='set the logging level',default =None, choices=["DEBUG","INFO","WARNING","ERROR","CRITICAL"])
     parser.add_argument('--single', '-s', help='Run on a single instance+branch only',action='store_true')
+    parser.add_argument('--csv', type=str,nargs="?", help='Store Data as a CSV',default=None)
     args = parser.parse_args()
     
     # Set logging configuration
@@ -76,7 +77,7 @@ def config_tests_yaml(path_to_yaml_config_file:str="config_tests.yaml"):
     logging.info(ColorPrint.yellow + f"Test file configuration {tests}" + ColorPrint.end)
     return tests
 
-def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict):
+def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict) -> tuple:
     dash_data = []
     assert tests_to_run.get('dashboard_tests') is not None, f"No key found for dashboard tests, please confirm the config_tests.yaml file is being passed in"
 
@@ -87,7 +88,8 @@ def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dic
         data = dc.get_data_for_test()
         logging.debug(ColorPrint.blue + f"Retrieve data for dash:{dashboard_id}: {data}" + ColorPrint.end)
         dash_data.append(data)
-    return dash_data
+    
+    return dash_data, pd.concat([*dash_data], ignore_index=True)
 
     
 if __name__ == '__main__':
@@ -102,6 +104,10 @@ if __name__ == '__main__':
     tests_to_run = config_tests_yaml()
 
     # Run tests
-    run_dashboard_tests(dashboard_list,instances,tests_to_run)
+    per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(dashboard_list,instances,tests_to_run)
+    
+    if args.get('csv'):
+        combined_dataframe.to_csv(args.get('csv'))
+
 
   

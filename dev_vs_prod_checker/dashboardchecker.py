@@ -3,6 +3,7 @@ from colorprint import ColorPrint
 from test import Test
 from tile import Tile
 import pandas as pd
+from functools import reduce
 import logging
 import pandas
 
@@ -16,7 +17,7 @@ class DashboardChecker(Dashboard):
         self.dashboard_level_tests:list = list(filter(lambda run_test: self.tests_to_run['dashboard_level'][run_test] == True,self.tests_to_run['dashboard_level'])) 
         self.tile_level_tests:list = list(filter(lambda run_test: self.tests_to_run['tile_level'][run_test] == True,self.tests_to_run['tile_level']))
     
-    def get_data_for_test(self) -> dict:
+    def get_data_for_test(self) -> list[pandas.DataFrame]:
         """
         - Method largely makes API calls to retrive data to be later used in testing + comparisons
         - Certain methods require multiple API calls, these are specified in the self.api_methods
@@ -35,11 +36,6 @@ class DashboardChecker(Dashboard):
                 # Check if test is set to true
                 result_from_test = getattr(Test,method_to_test)(dash)
                 output.append([instance_environment,dash.title,"dashboard",method_to_test,result_from_test])  
-                # # if key exists
-                # if output.get(instance_environment):
-                #     output[instance_environment].append(result_from_test)
-                # else:
-                #     output[instance_environment] = [result_from_test]
 
             # Run tile level tests
             logging.info(ColorPrint.yellow + f"Runnings tile level tests: {self.tile_level_tests}" + ColorPrint.end)
@@ -54,12 +50,12 @@ class DashboardChecker(Dashboard):
             instance_dfs.append(pd.DataFrame(output,columns =['instance_environment','dashboard_title','level','test','test_result']))
 
 
-        # keyorder = ["dash_name","tests"] + [instance.config_instance + "." + instance.environment for instance in self.instances]
-        # logging.info(ColorPrint.blue + f"Sort order of the output is: {keyorder}" + ColorPrint.end)
-        # output["tests"] = [self.dashboard_level_tests] + [self.tile_level_tests]
-        # output["dash_name"] = [dash.title] * len(output["tests"]) 
-        # sorted_output = {k: output[k] for k in keyorder if k in output} # Custom ordering, works on Python >3.6
-        return instance_dfs 
+        # Merge, via outer join, the dataframes together
+        if len(instance_dfs) > 1:
+            combined = reduce(lambda left,right: pd.merge(left, right, on=['dashboard_title','level','test'], how='outer'), [*instance_dfs])
+            instance_dfs.append(combined[sorted(combined.columns)])
+                
+        return instance_dfs[-1]
 
     def output_tests(self) -> pandas.DataFrame:
         """
