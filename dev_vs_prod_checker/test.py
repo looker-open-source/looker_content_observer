@@ -109,6 +109,6 @@ class Test:
 
     def get_api_success(tile:Tile):
         if tile.tile_data_error:
-            return False
+            return f"failed - {tile.looker_error_sdk_message}"
         else:
-            return True
+            return "successful"

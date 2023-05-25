@@ -102,6 +102,7 @@ class Tile:
             except:
                 logging.warning(ColorPrint.red + f"Error running query, could not retrieve data" + ColorPrint.end)
                 self.tile_data_error = True
+                self.looker_error_sdk_message = "Error in API call, could not retrieve data"
         # Get data for merged query tile viz
         elif self.tile_type == "Merged Query":
             merge_list = self.sdk.merge_query(self.tile.merge_result_id)
@@ -120,6 +121,7 @@ class Tile:
                 except:
                     logging.warning(ColorPrint.red + f"Error running query, could not retrieve data" + ColorPrint.end)
                     self.tile_data_error = True
+                    self.looker_error_sdk_message = "Error in API call, could not retrieve data"
         elif self.tile_type == "Look":     
             try:
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.look.query.id,result_format='json'))
@@ -134,8 +136,9 @@ class Tile:
                 self.tile_data_error = True
                 self.looker_error_sdk_message = df.values[0][0]
             except:
-                logging.error("Error running following tile:",self.tile_pkey)
+                logging.warning("Error running following tile:",self.tile_pkey)
                 self.tile_data_error = True
+                self.looker_error_sdk_message = "Error in API call, could not retrieve data"
         else:
             logging.info(ColorPrint.yellow + f"Tile: {self.tile_pkey} skipped as not of type 'vis'" + ColorPrint.end)
 
