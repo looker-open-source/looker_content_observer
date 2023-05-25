@@ -5,7 +5,7 @@ import logging
 from lookerenvironment import LookerEnvironment
 
 class Tile: 
-    def __init__(self,tile, dashboard_layout:list[object], sdk:LookerEnvironment) -> None:
+    def __init__(self,tile, dashboard_layout:list, sdk:LookerEnvironment) -> None:
         self.tile = tile
         self.dashboard_layout = dashboard_layout 
         self.sdk = sdk
@@ -16,8 +16,8 @@ class Tile:
         self.tile_pkey:str = f"{self.tile_layout}|{self.tile_name}|{self.tile_type}"
         self.tile_df: pd.DataFrame = None
         self.tile_df_dimensions:tuple(int) = None
-        self.tile_merged_dfs:list[pd.DataFrame] = []
-        self.tile_merged_dfs_dimensions:list[pd.DataFrame] = []
+        self.tile_merged_dfs:list = []
+        self.tile_merged_dfs_dimensions:list = []
         self.tile_data_error:bool = False
 
     def get_name_of_tile(self):

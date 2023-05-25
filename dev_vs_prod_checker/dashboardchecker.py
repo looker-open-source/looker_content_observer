@@ -17,7 +17,7 @@ class DashboardChecker(Dashboard):
         self.dashboard_level_tests:list = list(filter(lambda run_test: self.tests_to_run['dashboard_level'][run_test] == True,self.tests_to_run['dashboard_level'])) 
         self.tile_level_tests:list = list(filter(lambda run_test: self.tests_to_run['tile_level'][run_test] == True,self.tests_to_run['tile_level']))
     
-    def get_data_for_test(self) -> list[pandas.DataFrame]:
+    def get_data_for_test(self) -> list:
         """
         - Method largely makes API calls to retrive data to be later used in testing + comparisons
         - Certain methods require multiple API calls, these are specified in the self.api_methods

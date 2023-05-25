@@ -15,8 +15,8 @@ dashboard_tests:
     get_tile_names: False
   tile_level:
     get_tile_data: False
-    get_tile_dimensions: True
+    get_tile_dimensions: False
     get_tile_position: True
     get_api_success: False
 look_tests:
-  get_look_data: False
+  get_look_data: True

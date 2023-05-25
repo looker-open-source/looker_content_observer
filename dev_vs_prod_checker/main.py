@@ -6,10 +6,10 @@ import logging,configparser,argparse,yaml
 from colorprint import ColorPrint
 import pandas as pd
 
-dashboard_list = ["jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
+# dashboard_list = ["jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
 # dashboard_list = [""]
-# dashboard_list = ["13","data_block_acs_bigquery::testing_dashboard"] #,"data_block_acs_bigquery::acs_census_overview"]
-look_list = ["13","14"]
+dashboard_list = ["13"]#"data_block_acs_bigquery::testing_dashboard"] #13,"data_block_acs_bigquery::acs_census_overview"]
+# look_list = ["13","14"]
 
 def setup() -> dict:
     """
@@ -80,7 +80,7 @@ def config_tests_yaml(path_to_yaml_config_file:str="config_tests.yaml"):
     logging.info(ColorPrint.yellow + f"Test file configuration {tests}" + ColorPrint.end)
     return tests
 
-def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict) -> tuple[pd.DataFrame]:
+def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dict) -> tuple:
     """
     - Retrieves data for each test 
     :returns: each dashboard as element within list, all dashboards combined into a single pandas dataframe 
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     # Retrieve a list of tests to run on the instances
     tests_to_run = config_tests_yaml()
 
-    print(ColorPrint.green +"Runnig Tests" + ColorPrint.end)
+    print(ColorPrint.green +"Running Tests" + ColorPrint.end)
     # Run tests
     per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(dashboard_list,instances,tests_to_run)
     logging.info(ColorPrint.yellow + f"Combined DataFrame:\n{combined_dataframe}" + ColorPrint.end)
