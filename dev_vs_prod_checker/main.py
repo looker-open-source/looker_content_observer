@@ -6,8 +6,8 @@ import logging,configparser,argparse,yaml
 from colorprint import ColorPrint
 import pandas as pd
 
-dashboard_list = ["jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
-# dashboard_list = ["2"]
+# dashboard_list = ["jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
+dashboard_list = ["2"]
 # dashboard_list = ["13"]#"data_block_acs_bigquery::testing_dashboard"] #13,"data_block_acs_bigquery::acs_census_overview"]
 # look_list = ["13","14"]
 
@@ -128,7 +128,6 @@ if __name__ == '__main__':
     for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == True].iterrows():
         print(ColorPrint.green + "Passed on following test:" + ColorPrint.end)
         print(row,"\n")
-
 
     # If optional arg for csv, create a CSV file
     if args.get('csv'):
