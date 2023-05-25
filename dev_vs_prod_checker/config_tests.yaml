@@ -9,14 +9,14 @@ dashboard_tests:
     get_number_tiles_in_dash: True
     # Tests the number of tiles in the dashboard
     get_number_filters_in_dash: True 
-    get_hash_of_all_filters: True
-    get_type_of_dashboard: True
-    get_composition_of_dashboard: True
+    get_hash_of_all_filters: False
+    get_type_of_dashboard: False
+    get_composition_of_dashboard: False
     get_tile_names: False
   tile_level:
-    get_tile_data: False
-    get_tile_dimensions: False
+    get_tile_data: True
+    get_tile_dimensions: True
     get_tile_position: True
-    get_api_success: False
+    get_api_success: True
 look_tests:
   get_look_data: True

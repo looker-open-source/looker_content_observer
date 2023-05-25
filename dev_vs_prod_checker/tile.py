@@ -9,16 +9,17 @@ class Tile:
         self.tile = tile
         self.dashboard_layout = dashboard_layout 
         self.sdk = sdk
-        self.tile_name:str = self.get_name_of_tile() # Returns name of tile
-        self.tile_type:str = self.get_type_of_tile() # Returns type of tile, i.e. viz or button or text
-        self.tile_id:str = self.get_tile_id() # Returns the dashboard id of the tile
-        self.tile_layout:str = "-".join(map(str,self.get_tile_position()))
-        self.tile_pkey:str = f"{self.tile_layout}|{self.tile_name}|{self.tile_type}"
-        self.tile_df: pd.DataFrame = None
-        self.tile_df_dimensions:tuple(int) = None
-        self.tile_merged_dfs:list = []
-        self.tile_merged_dfs_dimensions:list = []
-        self.tile_data_error:bool = False
+        self.tile_name = self.get_name_of_tile() # Returns name of tile
+        self.tile_type = self.get_type_of_tile() # Returns type of tile, i.e. viz or button or text
+        self.tile_id = self.get_tile_id() # Returns the dashboard id of the tile
+        self.tile_layout = "-".join(map(str,self.get_tile_position()))
+        self.tile_pkey = f"{self.tile_layout}|{self.tile_name}|{self.tile_type}"
+        self.tile_df = None
+        self.tile_df_dimensions = None
+        self.tile_merged_dfs = []
+        self.tile_merged_dfs_dimensions = []
+        self.tile_data_error = False
+        self.looker_error_sdk_message = None
 
     def get_name_of_tile(self):
         """
@@ -90,11 +91,16 @@ class Tile:
         if self.tile_type == "Tile":
             try:
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.result_maker.query_id,result_format='json'))
-                self.tile_df = df
-                self.tile_data_dimensions = df.shape # Set the dimensions of the tile based on the underlying data
-                logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
+                logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
+                assert "looker_error" not in df.columns.values
+                self.tile_df = df.astype(str)
+                self.tile_df_dimensions = df.shape
+            except AssertionError:
+                logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile" + ColorPrint.end)
+                self.tile_data_error = True
+                self.looker_error_sdk_message = df.values[0][0]
             except:
-                logging.error("Error running following tile:",self.tile_pkey)
+                logging.warning(ColorPrint.red + f"Error running query, could not retrieve data" + ColorPrint.end)
                 self.tile_data_error = True
         # Get data for merged query tile viz
         elif self.tile_type == "Merged Query":
@@ -102,26 +108,36 @@ class Tile:
             for source_query in merge_list.source_queries:
                 try: 
                     df = pd.read_json(self.sdk.run_query(query_id=source_query.query_id,result_format='json'))
-                    self.tile_merged_dfs.append(df)
-                    self.tile_merged_dfs.append(df.shape)
+                    logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
                     logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
+                    assert "looker_error" not in df.columns.values
+                    self.tile_merged_dfs.append(df.astype(str))
+                    self.tile_merged_dfs_dimensions.append(df.shape)
+                except AssertionError:
+                    logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile" + ColorPrint.end)
+                    self.tile_data_error = True
+                    self.looker_error_sdk_message = df.values[0][0]
                 except:
-                    logging.error("Error running following tile:",self.tile_pkey)
+                    logging.warning(ColorPrint.red + f"Error running query, could not retrieve data" + ColorPrint.end)
                     self.tile_data_error = True
         elif self.tile_type == "Look":     
             try:
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.look.query.id,result_format='json'))
-                self.tile_df = df
+                logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
+                logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
+                assert "looker_error" not in df.columns.values
+                self.tile_df = df.astype(str)
                 self.tile_data_dimensions = df.shape # Set the dimensions of the tile based on the underlying data
                 logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
+            except AssertionError:
+                logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile" + ColorPrint.end)
+                self.tile_data_error = True
+                self.looker_error_sdk_message = df.values[0][0]
             except:
                 logging.error("Error running following tile:",self.tile_pkey)
                 self.tile_data_error = True
         else:
-            logging.debug(ColorPrint.blue + f"Tile: {self.tile_pkey} skipped asnot of type 'vis'" + ColorPrint.end)
-
-
-
+            logging.info(ColorPrint.yellow + f"Tile: {self.tile_pkey} skipped as not of type 'vis'" + ColorPrint.end)
 
 
 

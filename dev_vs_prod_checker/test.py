@@ -15,6 +15,8 @@ class TestResult:
         - Find where the column == 'test', all columns to the right of this will be the ones we want to test 
         """
         test_index = (df.columns.get_loc("test") + 1)
+        logging.debug(ColorPrint.blue + f"Test index:{test_index}" + ColorPrint.end)
+        logging.debug(ColorPrint.blue + f"Shape of DF:{df.shape}" + ColorPrint.end)
         try:
             assert (df.shape[1] - test_index) > 1, f"Test only as one row"
             return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , df.iloc[:,test_index:].values))
@@ -79,13 +81,23 @@ class Test:
         return sorted(composition.items())
 
     def get_tile_data(tile:Tile):
-        if tile.tile_type == "Merged Query":
-            return tile.tile_merged_dfs
-        else:
-            return tile.tile_df
+        logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
+        tile.get_tile_data()
+        try:
+            if tile.tile_type == "Merged Query":
+                assert len(tile.tile_merged_dfs) > 0
+                return sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
+            else:
+                assert tile.tile_df is not None
+                return pd.util.hash_pandas_object(tile.tile_df).sum()
+        except AssertionError:
+            logging.warning(ColorPrint.blue + "Tile Contained no data, returning 0" + ColorPrint.end)
+            return 0
+
+
 
     def get_tile_dimensions(tile:Tile):
-        logging.debug(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
+        logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
         tile.get_tile_data()
         if tile.tile_type == "Merged Query":
             return tile.tile_merged_dfs_dimensions
