@@ -8,7 +8,7 @@
 4. Run the following from /dev_vs_prod_checker/ folder
 
 ```
-python3 main.py -i DEV UAT PROD -e production production production -l DEBUG --csv "test.csv"    
+python3 main.py -i GCP234 VM VM -e dev dev production -l DEBUG --csv "test.csv"    
 ```
 where "instance_name" is the name set in config.ini
 
