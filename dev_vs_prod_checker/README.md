@@ -19,12 +19,11 @@ Specifies the instance
 options:
   -h, --help            show this help message and exit
   --instance -i         Name of instances, names must match the looker.ini sections: 
-                        ->multiple instances should be space separated, ex: -i DEV UAT PROD
-  --environment -e    Name of environment, choices are either production or dev: 
-                        ->example: dev dev dev -> wuld run the code for each instance from the branch specified within the looker.ini file for each dev uat and prod instance
+                         ->multiple instances should be space separated, ex: -i GCP_Dev  GCP_UAT GCP_PROD
+  --environment -e      Name of environment, choices are either production or dev: 
+                        ->example: dev dev production -> each environment maps to the instance, i.e. the first 'dev' maps to the GCP_Dev instance, the second maps to the GCP_UAT instance, and the third element 'production' maps to the GCP_Prod instance
 
-  --loglevel [{DEBUG,INFO,WARNING,ERROR,CRITICAL}], -l [{DEBUG,INFO,WARNING,ERROR,CRITICAL}]
-                        set the logging level
-  --single, -s          Run on a single instance+branch only
-  --csv [CSV]           Store Data as a CSV
+  --loglevel            Choices are: [{DEBUG,INFO,WARNING,ERROR,CRITICAL}], the lower the level in logging, i.e. DEBUG or Info the more verbose the logs.
+                        ->Recommendation is try with INFO first.
+  --csv [CSV]           Store Data as a CSV, input as, for example, --csv "all_tests_output.csv"
 ```
