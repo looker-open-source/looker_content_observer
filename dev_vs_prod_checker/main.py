@@ -5,7 +5,7 @@ from test import TestResult
 import logging,configparser,argparse,yaml
 from colorprint import ColorPrint
 import pandas as pd
-
+pd.set_option('display.max_colwidth', None)
 # dashboard_list = ["jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
 dashboard_list = ["2"]
 # dashboard_list = ["13"]#"data_block_acs_bigquery::testing_dashboard"] #13,"data_block_acs_bigquery::acs_census_overview"]
@@ -125,9 +125,11 @@ if __name__ == '__main__':
         print(ColorPrint.red + "Error on following test:" + ColorPrint.end)
         print(row,"\n")
 
-    for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == True].iterrows():
-        print(ColorPrint.green + "Passed on following test:" + ColorPrint.end)
-        print(row,"\n")
+    for key,row in combined_dataframe["get_api_success" == combined_dataframe['test']].iterrows():
+        # Check if any of the values have the failure key of "failed -" for logging
+        if any("failed -" in val for val in row.values):                
+            print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
+            print(row,"\n")
 
     # If optional arg for csv, create a CSV file
     if args.get('csv'):

@@ -49,10 +49,9 @@ class DashboardChecker(Dashboard):
                     output.append([instance_environment,dash.title,f"tile-{t.tile_pkey}",tile_method_to_test,result_from_test])     
             instance_dfs.append(pd.DataFrame(output,columns =['instance_environment','dashboard_title','level','test','test_result']))
 
-
         # Merge, via outer join, the dataframes together
         if len(instance_dfs) > 1:
             combined = reduce(lambda left,right: pd.merge(left, right, on=['dashboard_title','level','test'], how='outer'), [*instance_dfs])
             instance_dfs.append(combined[sorted(combined.columns)])
                 
-        return instance_dfs[-1]
+        return instance_dfs[-1] 
