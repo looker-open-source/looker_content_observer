@@ -104,18 +104,18 @@ def run_dashboard_tests(dashboards_to_check:list,instances:list,tests_to_run:dic
     
 if __name__ == '__main__':
     # Run setup, parses the command line arguments and stores them into a dictionary called kwargs
-    print("Parsing command line arguments:")
+    print(ColorPrint.green + "Step 1: Parsing command line arguments:" + ColorPrint.end)
     args = setup()
     
-    print("Configuring list of instances to test:")
+    print(ColorPrint.green + "Configuring list of instances to test:" + ColorPrint.end)
     # Retrieve a list of configured instances
     instances = config_instances(args)
 
-    print("Configuring list of tests to run:")
+    print(ColorPrint.green + "Configuring list of tests to run:" + ColorPrint.end)
     # Retrieve a list of tests to run on the instances
     tests_to_run = config_tests_yaml()
 
-    print("Runnig Tests")
+    print(ColorPrint.green +"Runnig Tests" + ColorPrint.end)
     # Run tests
     per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(dashboard_list,instances,tests_to_run)
     logging.info(ColorPrint.yellow + f"Combined DataFrame:\n{combined_dataframe}" + ColorPrint.end)
@@ -124,7 +124,12 @@ if __name__ == '__main__':
     for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == False].iterrows():
         print(ColorPrint.red + "Error on following test:" + ColorPrint.end)
         print(row,"\n")
-    
+
+    for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == True].iterrows():
+        print(ColorPrint.green + "Passed on following test:" + ColorPrint.end)
+        print(row,"\n")
+
+
     # If optional arg for csv, create a CSV file
     if args.get('csv'):
         combined_dataframe.to_csv(args.get('csv'))

@@ -2,11 +2,13 @@ import pandas as pd
 from colorprint import ColorPrint
 import json
 import logging
+from lookerenvironment import LookerEnvironment
 
 class Tile: 
-    def __init__(self,tile, dashboard_layout:list[object]) -> None:
+    def __init__(self,tile, dashboard_layout:list[object], sdk:LookerEnvironment) -> None:
         self.tile = tile
         self.dashboard_layout = dashboard_layout 
+        self.sdk = sdk
         self.tile_name:str = self.get_name_of_tile() # Returns name of tile
         self.tile_type:str = self.get_type_of_tile() # Returns type of tile, i.e. viz or button or text
         self.tile_id:str = self.get_tile_id() # Returns the dashboard id of the tile
@@ -83,11 +85,11 @@ class Tile:
                                     filter_for_tile[0].height)
         return layout
     
-    def get_tile_data(self,sdk:object):
+    def get_tile_data(self):
         # Get data for single tile viz
         if self.tile_type == "Tile":
             try:
-                df = pd.read_json(sdk.run_query(query_id=self.tile.result_maker.query_id,result_format='json'))
+                df = pd.read_json(self.sdk.run_query(query_id=self.tile.result_maker.query_id,result_format='json'))
                 self.tile_df = df
                 self.tile_data_dimensions = df.shape # Set the dimensions of the tile based on the underlying data
                 logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
@@ -96,10 +98,10 @@ class Tile:
                 self.tile_data_error = True
         # Get data for merged query tile viz
         elif self.tile_type == "Merged Query":
-            merge_list = sdk.merge_query(self.tile.merge_result_id)
+            merge_list = self.sdk.merge_query(self.tile.merge_result_id)
             for source_query in merge_list.source_queries:
                 try: 
-                    df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
+                    df = pd.read_json(self.sdk.run_query(query_id=source_query.query_id,result_format='json'))
                     self.tile_merged_dfs.append(df)
                     self.tile_merged_dfs.append(df.shape)
                     logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
@@ -108,7 +110,7 @@ class Tile:
                     self.tile_data_error = True
         elif self.tile_type == "Look":     
             try:
-                df = pd.read_json(sdk.run_query(query_id=self.tile.look.query.id,result_format='json'))
+                df = pd.read_json(self.sdk.run_query(query_id=self.tile.look.query.id,result_format='json'))
                 self.tile_df = df
                 self.tile_data_dimensions = df.shape # Set the dimensions of the tile based on the underlying data
                 logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)

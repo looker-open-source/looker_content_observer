@@ -85,6 +85,8 @@ class Test:
             return tile.tile_df
 
     def get_tile_dimensions(tile:Tile):
+        logging.debug(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
+        tile.get_tile_data()
         if tile.tile_type == "Merged Query":
             return tile.tile_merged_dfs_dimensions
         else:

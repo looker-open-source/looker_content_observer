@@ -40,7 +40,7 @@ class DashboardChecker(Dashboard):
             # Run tile level tests
             logging.info(ColorPrint.yellow + f"Runnings tile level tests: {self.tile_level_tests}" + ColorPrint.end)
             for element in dash.dashboard_elements:
-                t = Tile(element,dash.dashboard_layouts)
+                t = Tile(element,dash.dashboard_layouts,instance.sdk)
                 for tile_method_to_test in self.tile_level_tests:
                     # Check if test is set to true
                     result_from_test = getattr(Test,tile_method_to_test)(t)
