@@ -8,7 +8,7 @@
 4. Run the following from /dev_vs_prod_checker/ folder
 
 ```
-python3 main.py -i <instance_name> 
+python3 main.py -i DEV UAT PROD -e production production production -l DEBUG --csv "test.csv"    
 ```
 where "instance_name" is the name set in config.ini
 
@@ -18,6 +18,13 @@ Specifies the instance
 
 options:
   -h, --help            show this help message and exit
-  --instance INSTANCE, -i INSTANCE
-                        Name of instance, as defined by the section within the looker.ini file
+  --instance -i         Name of instances, names must match the looker.ini sections: 
+                        ->multiple instances should be space separated, ex: -i DEV UAT PROD
+  --environment -e    Name of environment, choices are either production or dev: 
+                        ->example: dev dev dev -> wuld run the code for each instance from the branch specified within the looker.ini file for each dev uat and prod instance
+
+  --loglevel [{DEBUG,INFO,WARNING,ERROR,CRITICAL}], -l [{DEBUG,INFO,WARNING,ERROR,CRITICAL}]
+                        set the logging level
+  --single, -s          Run on a single instance+branch only
+  --csv [CSV]           Store Data as a CSV
 ```

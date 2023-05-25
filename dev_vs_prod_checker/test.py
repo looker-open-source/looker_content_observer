@@ -1,21 +1,36 @@
 import pandas as pd
 from dashboard import Dashboard
+from tile import Tile
+import logging
+from colorprint import ColorPrint
 import json
 
-class Test:
-    def is_equal(a,b) -> bool:
-        return a == b
-    
+class TestResult:
+ 
     def is_dataframe_equal(a:pd.DataFrame,b:pd.DataFrame) -> bool:
         return a.equals(b)
     
-    def get_number_tiles_in_dash(dash):
+    def is_data_equal(df:pd.DataFrame) -> bool:
+        """
+        - Find where the column == 'test', all columns to the right of this will be the ones we want to test 
+        """
+        test_index = (df.columns.get_loc("test") + 1)
+        logging.debug(ColorPrint.blue + f"Test index:{test_index}" + ColorPrint.end)
+        logging.debug(ColorPrint.blue + f"Shape of DF:{df.shape}" + ColorPrint.end)
+        try:
+            assert (df.shape[1] - test_index) > 1, f"Test only as one row"
+            return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , df.iloc[:,test_index:].values))
+        except AssertionError:
+            return ['N/A'] * df.shape[0]      
+
+class Test:    
+    def get_number_tiles_in_dash(dash:Dashboard):
         return len(dash.dashboard_elements)
     
-    def get_number_filters_in_dash(dash):
+    def get_number_filters_in_dash(dash:Dashboard):
         return len(dash.dashboard_filters)
     
-    def get_hash_of_all_filters(dash):
+    def get_hash_of_all_filters(dash:Dashboard):
         """
         overview: 
         - Each dashboard element is an object, this method converts the object into a string and then hashes the string and is used in a check to compare hashes
@@ -25,7 +40,7 @@ class Test:
         """
         return hash(frozenset([str(val) for val in sorted(dash.dashboard_filters, key= lambda obj: obj.id)]))
 
-    def get_type_of_dashboard(dash):
+    def get_type_of_dashboard(dash:Dashboard):
         # UDD - User defined dashboard
         return 'LookML Dashboard' if dash.lookml_link_id else 'UDD'
     
@@ -36,7 +51,7 @@ class Test:
             # print(dash_element)
         return None
     
-    def get_composition_of_dashboard(dash):
+    def get_composition_of_dashboard(dash:Dashboard):
         """
         overview: 
         - Tests if a dashboard has the same number of elements by the type of dashboard visualization
@@ -51,138 +66,34 @@ class Test:
                 composition[dash_element.type] += 1
         # Sort by keys
         return sorted(composition.items())
-
-    def get_name_of_tile(tile):
-        if tile.type == 'button':
-            try:
-                return json.loads(tile.rich_content_json)['text']
-            except: 
-                return "Error with parsing JSON of button"
-        elif tile.type == 'text':
-            return tile.title_text_as_html
-        elif tile.type == 'vis':
-            return tile.title
-        else:
-            return "Unmapped"
-
-    def get_tile_names(dash):
-        composition = {}
-        for tile in dash.dashboard_elements:
-            name_of_tile = Test.get_name_of_tile(tile)
-            if name_of_tile == None or name_of_tile == '':
-                name_of_tile = "None"
-            if name_of_tile not in composition:
-                composition[name_of_tile] = 1
-            else:
-                composition[name_of_tile] += 1
-        # Sort by keys
-        # print(composition)
-        return sorted(composition.items())
     
-    def get_tile_data(dash,sdk:object):
-        dfs = []
-        test2 = []
-        merge_list = []
-        composition = {}
-        for tile in dash.dashboard_elements:
-            name_of_tile = Test.get_name_of_tile(tile)
-            if name_of_tile == None or name_of_tile == '':
-                name_of_tile = "None"
-            if name_of_tile not in composition:
-                composition[name_of_tile] = 1
+    def get_tile_data(tile:Tile):
+        logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
+        tile.get_tile_data()
+        try:
+            if tile.tile_type == "Merged Query":
+                assert len(tile.tile_merged_dfs) > 0
+                return sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
             else:
-                composition[name_of_tile] += 1
-            # print("Checking............................",Test.get_name_of_tile(tile))
-            # print("Type of Tile.........................",tile.type)
-            if tile.type == 'vis' or tile.type == 'looker_map':
-                if tile.result_maker.query_id is not None: #most vis have a query ID, if they do not it is likely a merge query
-                    # Not using tile.query_id since that does not work on lookml dashboards
-                    # result_maker_list.append(tile.result_maker)
-                    # print("Length of result maker is",len(tile.result_maker))
-                    # for result_maker in result_maker_list:
-                    # print("QueryID from result maker is",tile.result_maker.query_id)
-                    failed_to_get_data = False                
-                    if tile.look_id == None: 
-                        # print(tile.title)
-                        # print(tile.result_maker.query_id)
-                        # print(tile.id)
-                        # querydef = sdk.dashboard_element(dashboard_element_id=tile.id,fields="query(model,view,fields,pivots,fill_fields,filters,filter_expression,sorts,limit,column_limit,total,row_total,subtotals,vis_config,filter_config,visible_ui_sections,dynamic_fields,query_timezone)")
-                        # print(querydef.query)
-                        # df = pd.read_json(sdk.run_inline_query(result_format='json',body = querydef.query))
-                        # print(df)
-                        try:
-                            df = pd.read_json(sdk.run_query(query_id=tile.result_maker.query_id,result_format='json'))
-                            pd.set_option("display.max_colwidth", 1000) # TODO: not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
-                            output = {'df':df,
-                                "query_id":tile.result_maker.query_id,
-                                "is_empty": df.empty,
-                                "shape":df.shape,
-                                "tile_title":tile.title, 
-                                "could_get_api_data":failed_to_get_data}
-                            dfs.append(output)
-                            print("Success (Normal query tile)")
-                        except:
-                            print("Failed to get data from normal query tile")
-                            failed_to_get_data = True
-                            output = {'df':None,
-                                "query_id":tile.result_maker.query_id,
-                                "is_empty": None,
-                                "shape":None,
-                                "tile_title":tile.title, 
-                                "could_get_api_data":failed_to_get_data}
-                            dfs.append(output)
-                    elif tile.look_id is not None: 
-                        print(tile.look.title)
-                        print(tile.look.query.id)
-                        df = pd.read_json(sdk.run_query(query_id=tile.look.query.id,result_format='json'))
-                        pd.set_option("display.max_colwidth", 1000) #not the right place for this, but for some reason this is the only place i could get it to work without throwing error "NameError: name 'pd' is not defined"
-                        output = {'df':df,
-                            "query_id":tile.look.query.id,
-                            "is_empty": df.empty,
-                            "shape":df.shape,
-                            "tile_title":tile.look.title, 
-                            "could_get_api_data":failed_to_get_data}
-                        dfs.append(output)
-                        print("Success (Look tile)")
-                    else:
-                        failed_to_get_data = True
-                        print("Failed to get data from look tile")
-                        output = {'df':None,
-                            "query_id":tile.look.query.id,
-                            "is_empty": None,
-                            "shape":None,
-                            "tile_title":tile.look.title, 
-                            "could_get_api_data":failed_to_get_data}
-                        dfs.append(output)
-                    
-                elif tile.merge_result_id is not None: #handle a merge query
-                    try:
-                        merge_list = sdk.merge_query(tile.merge_result_id)
-                        for source_query in merge_list.source_queries:
-                            try: 
-                                df = pd.read_json(sdk.run_query(query_id=source_query.query_id,result_format='json'))
-                                output = {'df':df,
-                                    "query_id":source_query.query_id,
-                                    "is_empty": df.empty,
-                                    "shape":df.shape,
-                                    "tile_title":tile.title, 
-                                    "could_get_api_data":failed_to_get_data}
-                                dfs.append(output)
-                                print("Success (Merged query)")
-                            except:
-                                print("Failed to get data from merged query")
-                                failed_to_get_data = True
-                                output = {'df':None,
-                                    "query_id":source_query.query_id,
-                                    "is_empty": None,
-                                    "shape":None,
-                                    "tile_title":tile.title, 
-                                    "could_get_api_data":failed_to_get_data}
-                                dfs.append(output)
-                    except:
-                        print("Fail to identify merged ID")
-                        failed_to_get_data = True
-                else:
-                    failed_to_get_data = True
-                    print("Fail to get data Fail Fail")
-        return dfs
+                assert tile.tile_df is not None
+                return pd.util.hash_pandas_object(tile.tile_df).sum()
+        except AssertionError:
+            logging.warning(ColorPrint.yellow + f"{tile.tile_name} contained no data" + ColorPrint.end)
+            return 0
+
+    def get_tile_dimensions(tile:Tile):
+        logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
+        tile.get_tile_data()
+        if tile.tile_type == "Merged Query":
+            return tile.tile_merged_dfs_dimensions
+        else:
+            return tile.tile_df_dimensions
+
+    def get_tile_position(tile:Tile):
+        return tile.tile_layout
+
+    def get_api_success(tile:Tile):
+        if tile.tile_data_error:
+            return f"failed - {tile.looker_error_sdk_message}"
+        else:
+            return "successful"
