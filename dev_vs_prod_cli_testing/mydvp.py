@@ -29,11 +29,6 @@ def run_mydvp(ctx):
     print("Running mydvp")
 
 
-# @run_mydvp.command("test",help="Test Command")
-# def run_mydvp(level):
-#     logging.basicConfig(level=getattr(logging,level))\
 
-# cli.add_command(init_mydvp)
-# cli.add_command(run_mydvp)
-
-cli(obj={})
+if __name__ == "__main__":
+    cli(obj={})
