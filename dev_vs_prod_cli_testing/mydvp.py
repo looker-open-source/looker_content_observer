@@ -1,45 +1,39 @@
 import click 
-
-
-# @click.command
-# @click.option("--name",prompt="Enter your name: ",help="Nam eof user")
-# def hello(name):
-#     # click.echo(f"Hello {name}")
-#     print(f"Hello {name}")
-#     return name
-
+import logging
 
 @click.group
-@click.option('--init',help="Startup Command Available")
-def cli():
-    pass 
+@click.option('-l','--logging',
+              help ="Set the logging level",
+              type=click.Choice(['debug', 'info','critical'],
+                                case_sensitive=False),
+              default = 'critical')
+@click.pass_context
+def cli(ctx,logging):
+    # Context Obj Docs: https://click.palletsprojects.com/en/8.1.x/complex/#contexts
+    ctx.ensure_object(dict)
+    # TODO: What does this mean / do exactly
+    ctx.obj['LOGGING'] = logging.upper()
 
-@click.command
-@click.option("--init",help="Init for the MyDvP")
-def initmydvp():
+@cli.command("init",help="Instialize Multi-Instance Dev vs Production Tool")
+@click.pass_context
+def init_mydvp(ctx):
+    logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
     print("Initialize Multiinstance Dev vs. Production")
 
-@click.command
-def dropmydvp():
-    print("Remove My DvP")
+@cli.command("run",help="Run mydvp")
+@click.pass_context
+def run_mydvp(ctx):
+    logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
+    logging.info(f"Logging info configured at {ctx.obj['LOGGING']}") 
+    logging.info(f"ctx is of type {ctx.__dict__}")
+    print("Running mydvp")
 
 
-@click.group
-def test():
-    pass 
+# @run_mydvp.command("test",help="Test Command")
+# def run_mydvp(level):
+#     logging.basicConfig(level=getattr(logging,level))\
 
-@click.command
-def another():
-    print("Initialize Multiinstance Dev vs. Production")
+# cli.add_command(init_mydvp)
+# cli.add_command(run_mydvp)
 
-@click.command
-def one():
-    print("Remove My DvP")
-
-
-cli.add_command(initmydvp)
-cli.add_command(dropmydvp)
-
-cli.add_command(another)
-cli.add_command(one)
-cli()
+cli(obj={})
