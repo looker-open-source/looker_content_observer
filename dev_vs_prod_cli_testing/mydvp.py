@@ -1,7 +1,18 @@
 import click 
 import logging
+from init_mydvp import init_mydvp
+from run_mydvp import run_mydvp
 
-@click.group
+# Set list of commands
+commands = {
+    "init":init_mydvp, 
+    "run": run_mydvp
+}
+
+# Set Root level commands
+@click.group(
+        commands = commands
+)
 @click.option('-l','--logging',
               help ="Set the logging level",
               type=click.Choice(['debug', 'info','critical'],
@@ -13,21 +24,6 @@ def cli(ctx,logging):
     ctx.ensure_object(dict)
     # TODO: What does this mean / do exactly
     ctx.obj['LOGGING'] = logging.upper()
-
-@cli.command("init",help="Instialize Multi-Instance Dev vs Production Tool")
-@click.pass_context
-def init_mydvp(ctx):
-    logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
-    print("Initialize Multiinstance Dev vs. Production")
-
-@cli.command("run",help="Run mydvp")
-@click.pass_context
-def run_mydvp(ctx):
-    logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
-    logging.info(f"Logging info configured at {ctx.obj['LOGGING']}") 
-    logging.info(f"ctx is of type {ctx.__dict__}")
-    print("Running mydvp")
-
 
 
 if __name__ == "__main__":

@@ -5,7 +5,8 @@ setup(
     version='0.0.1',
     py_modules=['mydvp'],
     install_requires=[
-        'Click',
+        "click>=8.0",
+        "PyYAML>=5.1",
     ],
     entry_points={
         'console_scripts': [
