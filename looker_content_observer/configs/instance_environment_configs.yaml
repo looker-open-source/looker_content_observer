@@ -5,4 +5,4 @@
 - branch: my_dev_branch
   environment: dev
   instance: VM
-  project: looker_ssh
+  project: my_looker_project
