@@ -1,8 +1,4 @@
-GCP234:
-  branch: null
-  environment: production
-  project: null
 VM:
-  branch: null
-  environment: production
-  project: null
+  branch: rr_testing_dev_vs_prod
+  environment: dev
+  project: looker_ssh
