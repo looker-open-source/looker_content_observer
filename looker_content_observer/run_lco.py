@@ -17,6 +17,14 @@ def run_lco(ctx):
 
 # TODO: Turn run_all_lco with options to either read in a list from a file or take in a list from command line
 @run_lco.command("all",help="Run a full test, test all dashboards")
+@click.option('-d',
+              '--dashboard',
+              'dashboard',
+              type=click.STRING,
+              help='Name, id, or slug of dashboard',
+              multiple=True,
+              required=True
+              )
 @click.option('-f',
               '--looker-file-path',
               'looker_file',
@@ -45,12 +53,13 @@ def run_lco(ctx):
               required = False)
 @click.pass_context
 def run_all_lco(ctx,
+                dashboard:list,
                 looker_file:str,
                 test_file:str,
                 csv:bool,
                 csv_name:str):
     logging.info("Testing all dashboards")
-    dashboard_list = ["2","jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
+    dashboard_list = dashboard
     instances = config_instances(looker_file)
     tests = config_tests(test_file)
 

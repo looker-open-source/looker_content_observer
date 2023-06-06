@@ -2,7 +2,7 @@
   environment: production
   instance: VM
   project: null
-- branch: my_dev_branch
+- branch: rr_testing_dev_vs_prod
   environment: dev
   instance: VM
-  project: my_looker_project
+  project: looker_ssh
