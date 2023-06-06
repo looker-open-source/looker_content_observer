@@ -1,0 +1,21 @@
+########################################################################
+
+# Overview
+
+########################################################################
+dashboard_tests:
+  dashboard_level:
+    # Tests the number of tiles in the dashboard
+    get_number_tiles_in_dash: True
+    # Tests the number of tiles in the dashboard
+    get_number_filters_in_dash: True 
+    get_hash_of_all_filters: True
+    get_type_of_dashboard: True
+    get_composition_of_dashboard: True
+  tile_level:
+    get_tile_data: True
+    get_tile_dimensions: True
+    get_tile_position: True
+    get_api_success: True
+look_tests:
+  get_look_data: True
