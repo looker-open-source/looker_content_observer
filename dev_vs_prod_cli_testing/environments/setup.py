@@ -7,17 +7,14 @@ import os.path
 def input_sanization():
     pass
 
-def write_instances_to_yaml():
-    pass 
-
 # Looker file typically more sensitive
-def _read_sections(looker_file):
+def _read_sections(looker_file:os.path) -> list:
     config = configparser.ConfigParser()
     file = looker_file
     config.read(file)
     return [key for key in config._sections.keys()]
 
-def add_environment(add_instance:str = 'y',looker_file = "looker.ini"):
+def add_environment(add_instance:str = 'y',looker_file = "looker.ini") -> list:
     instances = []
 
     # Check if looker ini file exists
@@ -76,3 +73,19 @@ def add_environment(add_instance:str = 'y',looker_file = "looker.ini"):
     logging.info(f"Instances {instances}")
     logging.info("Writing instances to environment_setup.yaml file")
     return instances
+
+def create_instance_yaml(instances:list) -> yaml:
+    # Format list of tuples into a dictionary for easier loading to YAML File
+    instance_dict = {}
+    format_instance_list = lambda format_instance: { "environment": 'dev' if format_instance[1] != 'production' else 'production',
+                                "project": str(format_instance[1].split("::")[0]) if format_instance[1] != 'production' else None,
+                                "branch": str(format_instance[1].split("::")[1]) if format_instance[1] != 'production' else None, 
+                            }
+    # Each instance (dict key) will have payload of instance environment, project, and branch
+    for instance in instances: 
+        instance_dict[instance[0]] = format_instance_list(instance)
+    
+    with open("configs/instance_environment_configs.yaml","w") as file:
+        yaml_file = yaml.dump(instance_dict,file) 
+
+    logging.info("Created the instance + environment configuration file")    

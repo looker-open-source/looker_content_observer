@@ -1,6 +1,6 @@
 import click
 import logging
-from environments.setup import add_environment
+from environments.setup import add_environment,create_instance_yaml
 
 # TODO: Groups that want to go pure CLI and not go through init cycle
 
@@ -16,12 +16,14 @@ def init_mydvp(ctx):
 @click.option('-f',
               '--file-path',
               'looker_file',
+              type=click.Path(exists=True), # Validates that file path is valid
               help='File path for looker.ini file',
               default = 'looker.ini')
 def setup(ctx,looker_file):
     logging.info("Running setup for environments")
     logging.info(f"looker.ini file path: {looker_file}")
     instances = add_environment(looker_file=looker_file)
+    create_instance_yaml(instances)
     print("Instances",instances)
 
 
@@ -35,5 +37,6 @@ def setup(ctx,looker_file):
               help = "For each instance, enter in the looker.ini section name + either 'production' or <looker_project>::<dev_branch>")
 @click.pass_context
 def args_setup(ctx,instances):
-    print(instances)
-    pass 
+    create_instance_yaml(instances)
+    logging.info("Saved instance + environment configuration to the configs/instance_environment_configs.yaml file")
+    
