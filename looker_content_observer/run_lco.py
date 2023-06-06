@@ -4,12 +4,12 @@ import logging
 
 @click.group(name='run', help="Run the Multi Instance Dashboard Checker")
 @click.pass_context
-def run_mydvp(ctx):
+def run_lco(ctx):
     logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
     print("Intializing Run")
 
 
-@run_mydvp.command("all",help="Run a full test, test all dashboards")
+@run_lco.command("all",help="Run a full test, test all dashboards")
 @click.pass_context
 def run_all_mydvp(ctx):
     logging.info("Setting log run")

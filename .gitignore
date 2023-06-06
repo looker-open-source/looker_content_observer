@@ -19,3 +19,6 @@ dev_vs_prod_cli_testing/__pycache__/*
 dev_vs_prod_cli_testing/environments/__pycache__/*
 dev_vs_prod_cli_testing/environments/__pycache__/*.pyc
 dev_vs_prod_cli_testing/configs/instance_environment_configs.yaml
+looker_content_observer/__pycache__/*
+looker_content_observer/lco.egg-info/*
+looker_content_observer/environments/__pycache__/setup.*.pyc

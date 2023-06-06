@@ -4,8 +4,8 @@
 
 ### [1] Create a virtual 'test' environment
 ```
-$ virtualenv test   
-$ source test/bin/activate         
+$ virtualenv lco   
+$ source lco/bin/activate         
 ```
 
 ### [2] Install the 'mydvp' package

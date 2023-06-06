@@ -6,12 +6,12 @@ from environments.setup import add_environment,create_instance_yaml
 
 @click.group(name="init",help="Setup for instances and environments")
 @click.pass_context
-def init_mydvp(ctx):
+def init_lco(ctx):
     logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
     print("Initialize Init")
 
 
-@init_mydvp.command("setup",help="Run setup via interface")
+@init_lco.command("setup",help="Run setup via interface")
 @click.pass_context
 @click.option('-f',
               '--file-path',
@@ -27,7 +27,7 @@ def setup(ctx,looker_file):
     print("Instances",instances)
 
 
-@init_mydvp.command("cli",
+@init_lco.command("cli",
                     help="Skip setup steps and enter information via command line args")
 @click.option('-i',
               '--instances',

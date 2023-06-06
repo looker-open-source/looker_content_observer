@@ -1,8 +1,8 @@
-LookerProduction:
-  branch: my_testbranch
-  environment: dev
-  project: looker_ssh
-LookerUAT:
+test:
   branch: null
   environment: production
   project: null
+test2:
+  branch: another_branch
+  environment: dev
+  project: looker_ssh
