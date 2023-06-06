@@ -18,3 +18,4 @@ dev_vs_prod_cli_testing/mydvp.egg-info/*
 dev_vs_prod_cli_testing/__pycache__/*
 dev_vs_prod_cli_testing/environments/__pycache__/*
 dev_vs_prod_cli_testing/environments/__pycache__/*.pyc
+dev_vs_prod_cli_testing/configs/instance_environment_configs.yaml
