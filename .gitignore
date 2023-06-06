@@ -16,4 +16,4 @@ dev_vs_prod_cli_testing/cli/*
 *.egg-info/
 *.egg
 instance_environment_configs.yaml
-looker_content_observer/*.csv
+looker_content_observer/outputs/*.csv

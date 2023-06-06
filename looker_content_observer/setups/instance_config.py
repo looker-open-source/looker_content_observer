@@ -48,18 +48,22 @@ def config_instances(looker_file:str = "looker.ini") -> list:
     instance_env_config = load_instance_env_yaml()
     instances = []
 
-    for instance, environment in instance_env_config.items():
-        logging.info(ColorPrint.yellow + f"Starting connection to instance:{instance}, on {environment}" + ColorPrint.end)
-        instance_to_test = LookerEnvironment(environment.get('environment'), 
+    for instance in instance_env_config:
+        logging.info(ColorPrint.yellow + f"Starting connection to instance:{instance.get('instance')}, on {instance.get('environment')}" + ColorPrint.end)
+        logging.debug(ColorPrint.blue + f"Checking instance payload: {instance}" + ColorPrint.end )
+        logging.debug(ColorPrint.blue + f"Checking instance Instance: {instance.get('instance')}" + ColorPrint.end )
+        logging.debug(ColorPrint.blue + f"Checking instance Environment: {instance.get('environment')}" + ColorPrint.end )
+        instance_to_test = LookerEnvironment(instance.get('environment'), 
                                              config_file=looker_file,
-                                             config_instance=instance)
+                                             config_instance=instance.get('instance'))
         # If we are testing a dev branch from an instance, we need to first checkout the dev branch in quest
         # Note: the code tested will based on the latest committed code, please commit any code changes prior to running script
-        if environment.get('environment') == 'dev':
+        if instance.get('environment') == 'dev':
             # The Looker project and dev branch are configured as keys within the looker.ini (or .ini equivalent file)
             # Checkout dev branch of the instance, dev branch specified in the looker ini file
-            instance_to_test.checkout_dev_branch(environment.get('project'),
-                                                environment.get('branch'))
+            logging.debug("Checkout dev branch")
+            instance_to_test.checkout_dev_branch(instance.get('project'),
+                                                instance.get('branch'))
             logging.info(ColorPrint.green + "Succesfully checked out dev branch" + ColorPrint.end)
         # Append to instance list
         instances.append(instance_to_test)
