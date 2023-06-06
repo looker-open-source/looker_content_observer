@@ -39,4 +39,4 @@ def setup(ctx,looker_file):
 def args_setup(ctx,instances):
     create_instance_yaml(instances)
     logging.info("Saved instance + environment configuration to the configs/instance_environment_configs.yaml file")
-    
+    print("Following instances loaded via CLI:",instances)

@@ -1,3 +1,5 @@
+# Looker Content Observer (LCO)
+
 # Quickstart
 
 ## Install / Setup
@@ -22,8 +24,11 @@ $ pip3 install --editable .
 ## CLI Skeleton / how to run:
 - [Skeleton of CLI](https://screencast.googleplex.com/cast/NDg0MTUzNzQ0ODk2ODE5Mnw1OGY1ZWJmZi00OQ)
 - Example comamnds: 
-  - `mydvp init` : Commands here will be used to set up instances and environment
-  - `mydvp run`: Commands here will be involved with running the dashboard/Look checkers
+  - `lco init` : Commands here will be used to set up instances and environment
+    - For the first time running the script, users should `init` as the first step
+  - `lco run`: Commands here will be involved with running the dashboard/Look checkers
+    - Run leverages the file created from the init phase 
+
 
 
 # CLI Flows
