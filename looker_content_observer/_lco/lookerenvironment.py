@@ -62,4 +62,4 @@ class LookerEnvironment:
         """
         print sdk.me() to confirm if sdk is authenticated correctly
         """
-        return f"{self.me.__dict__}"
+        return f"API Connection to {self.config_instance} with User:{self.me.display_name}-Email:{self.me.email} API Credentials was successful."

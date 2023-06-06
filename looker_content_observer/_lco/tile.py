@@ -1,8 +1,8 @@
 import pandas as pd
 from _lco.colorprint import ColorPrint
+from _lco.lookerenvironment import LookerEnvironment
 import json
 import logging
-from _lco.lookerenvironment import LookerEnvironment
 
 class Tile: 
     def __init__(self,tile, dashboard_layout:list, sdk:LookerEnvironment) -> None:

@@ -13,6 +13,6 @@ dev_vs_prod_checker/testtile.py
 dev_vs_prod_checker/*.csv
 .DS_Store
 dev_vs_prod_cli_testing/cli/*
-dev_vs_prod_cli_testing/configs/instance_environment_configs.yaml
 *.egg-info/
 *.egg
+instance_environment_configs.yaml
