@@ -72,7 +72,7 @@ def run_all_lco(ctx,
             print(row,"\n")
 
     if csv: 
-        csv_file_name = datetime.now().strftime(f'{csv_name}_%H_%M_%d_%m_%Y.csv')
+        csv_file_name = datetime.now().strftime(f'outputs/{csv_name}_%H_%M_%d_%m_%Y.csv')
         combined_dataframe.to_csv(csv_file_name)
 
 
