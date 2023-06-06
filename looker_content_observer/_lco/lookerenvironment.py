@@ -1,7 +1,7 @@
 import pandas as pd
 import looker_sdk
 import urllib3
-from colorprint import ColorPrint
+from _lco.colorprint import ColorPrint
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
 

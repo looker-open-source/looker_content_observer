@@ -1,6 +1,6 @@
 import click
 import logging
-from environments.setup import add_environment,create_instance_yaml
+from setups.instance_env import add_environment,create_instance_yaml
 
 # TODO: Groups that want to go pure CLI and not go through init cycle
 

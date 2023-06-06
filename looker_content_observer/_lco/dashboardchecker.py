@@ -1,11 +1,10 @@
-from dashboard import Dashboard
-from colorprint import ColorPrint
-from test import Test
-from tile import Tile
+from _lco.dashboard import Dashboard
+from _lco.colorprint import ColorPrint
+from _lco.test import Test
+from _lco.tile import Tile
 import pandas as pd
 from functools import reduce
 import logging
-import pandas
 
 class DashboardChecker(Dashboard):
     def __init__(self, dashboard_id:str,instances:list,tests_to_run:dict) -> None:

@@ -1,8 +1,4 @@
-test:
-  branch: null
-  environment: production
-  project: null
-test2:
-  branch: another_branch
+VM:
+  branch: test_branch
   environment: dev
   project: looker_ssh

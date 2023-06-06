@@ -1,5 +1,5 @@
 import pandas as pd
-from colorprint import ColorPrint
+from _lco.colorprint import ColorPrint
 import json
 
 class Dashboard: 
