@@ -23,6 +23,20 @@ def load_instance_env_yaml(instance_env_file_path:str="configs/instance_environm
             print(exc)
     return instance_env_config
 
+def config_tests(path_to_yaml_config_file:str="configs/config_tests.yaml") -> dict:
+    """
+    - Reads in the tests specified within the "config_tests.yaml" file (or equivalent)
+    :returns: list of tests read in from the config_file_yaml
+    """
+    try:
+        with open(path_to_yaml_config_file, 'r') as file:
+            tests = yaml.safe_load(file)
+    except:
+        logging.error("Error reading YAML File")
+
+    logging.info(ColorPrint.yellow + f"Test file configuration {tests}" + ColorPrint.end)
+    return tests
+
 
 def config_instances(looker_file:str = "looker.ini") -> list:
     """

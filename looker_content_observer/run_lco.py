@@ -1,12 +1,8 @@
 import click 
-from _lco.dashboard import Dashboard
-from _lco.dashboardchecker import DashboardChecker
 from _lco.colorprint import ColorPrint
-from _lco.test import TestResult
-from setups.instance_config import config_instances
+from setups.instance_config import config_instances,config_tests
+from setups.dashboard_run import run_dashboard_tests
 import logging
-import pandas as pd
-
 
 # TODO: Setup a ME() command to authenticate the API credentials
 
@@ -21,17 +17,45 @@ def run_lco(ctx):
 # TODO: Turn run_all_lco with options to either read in a list from a file or take in a list from command line
 @run_lco.command("all",help="Run a full test, test all dashboards")
 @click.option('-f',
-              '--file-path',
+              '--looker-file-path',
               'looker_file',
               type=click.Path(exists=True), # Validates that file path is valid
               help='File path for looker.ini (or equivalent) file.',
               default = 'looker.ini')
+@click.option('-t',
+              '--test-file-path',
+              'test_file',
+              type=click.Path(exists=True), # Validates that file path is valid
+              help='Test Configurations Yaml File.',
+              default = 'configs/config_tests.yaml')
 @click.pass_context
-def run_all_lco(ctx,looker_file):
+def run_all_lco(ctx,
+                looker_file:str,
+                test_file:str):
     logging.info("Testing all dashboards")
-    pd.set_option('display.max_colwidth', None)
     dashboard_list = ["2","jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
-    instances = config_instances()
+    instances = config_instances(looker_file)
+    tests = config_tests(test_file)
+
+    print(ColorPrint.green +"Running Tests" + ColorPrint.end)
+    # Run tests
+    per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(dashboard_list,instances,tests)
+    logging.info(ColorPrint.yellow + f"Combined DataFrame:\n{combined_dataframe}" + ColorPrint.end)
+
+    # Logging Errors on rows where the data is not equal between columns
+    for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == False].iterrows():
+        print(ColorPrint.red + "Error on following test:" + ColorPrint.end)
+        print(row,"\n")
+
+    # Logging cases where there was an individual tile API error
+    for key,row in combined_dataframe["get_api_success" == combined_dataframe['test']].iterrows():
+        # Check if any of the values have the failure key of "failed -" for logging
+        if any("failed -" in str(val) for val in list(row)):                
+            print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
+            print(row,"\n")
+
+
+
 
 @run_lco.command("me",help="Help confirm if API credentials have been configured correctly per instances")
 @click.option('-f',

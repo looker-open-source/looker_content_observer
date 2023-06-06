@@ -3,7 +3,7 @@ from _lco.dashboard import Dashboard
 from _lco.colorprint import ColorPrint
 from _lco.tile import Tile
 import logging
-import json
+import numpy as np
 
 class TestResult:
  
@@ -73,7 +73,7 @@ class Test:
         try:
             if tile.tile_type == "Merged Query":
                 assert len(tile.tile_merged_dfs) > 0
-                return sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
+                return np.sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
             else:
                 assert tile.tile_df is not None
                 return pd.util.hash_pandas_object(tile.tile_df).sum()

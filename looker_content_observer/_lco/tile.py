@@ -98,7 +98,7 @@ class Tile:
             try:
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.result_maker.query_id,result_format='json'))
                 logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
-                assert "looker_error" not in df.columns.values
+                assert "looker_error" not in df.columns.values.astype(str)
                 self.tile_df = df.astype(str)
                 self.tile_df_dimensions = df.shape
             except AssertionError:
