@@ -48,15 +48,29 @@ class Tile:
         """
         logging.debug(ColorPrint.blue + f"Checking tile of type:{self.tile.type}" + ColorPrint.end)
         if self.tile.type == 'vis': 
-            if self.tile.merge_result_id is not None: 
-                return "Merged Query"
-            elif self.tile.look_id != None and self.tile.result_maker.query_id is not None:
-                return "Look"
-            elif self.tile.look_id == None and self.tile.result_maker.query_id is not None:
-                return "Tile"
-            else:
-                logging.warning(f"Unmapped vis type tile found:{self.tile}") 
+            try:
+                if self.tile.merge_result_id is not None: 
+                    return "Merged Query"
+                # In certain cases, the result_maker will either be None (empty) or contain a query_id
+                elif self.tile.look_id != None and self.tile.result_maker.__dict__.get('query_id') is not None:
+                    return "Look"
+                elif self.tile.look_id == None and self.tile.result_maker.__dict__.get('query_id') is not None:
+                    return "Tile"
+                else:
+                    error_message = "An unknown/unmapped visualization type was encountered, skipping evaluation for Tile."
+                    self.tile_data_error = True
+                    self.looker_error_sdk_message = error_message
+                    logging.warning(f"Unmapped vis type tile found:{self.tile}") 
+                    return "Unmapped Vis Tile"
+            except AttributeError:
+                error_message = "A Query_ID was found to be None, preventing methods used to classify / identify the type of tile"
+                logging.warning(ColorPrint.red + f"{error_message}.\n:" + ColorPrint.end)
+                logging.debug(self.tile) 
+                logging.warning(ColorPrint.red + f"Note: Tile will be skipped" + ColorPrint.end)
+                self.tile_data_error = True
+                self.looker_error_sdk_message = error_message
                 return "Unmapped Vis Tile"
+
         elif self.tile.type == 'text':
             return self.tile.type.capitalize()
         elif self.tile.type == 'button':
