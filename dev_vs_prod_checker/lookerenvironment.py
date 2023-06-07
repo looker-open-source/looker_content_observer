@@ -62,4 +62,5 @@ class LookerEnvironment:
         """
         print sdk.me() to confirm if sdk is authenticated correctly
         """
+        # TODO: Error handling in case the me() call fails
         return f"{self.me.__dict__}"

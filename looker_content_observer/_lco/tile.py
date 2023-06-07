@@ -3,6 +3,7 @@ from _lco.colorprint import ColorPrint
 from _lco.lookerenvironment import LookerEnvironment
 import json
 import logging
+import looker_sdk
 
 class Tile: 
     def __init__(self,tile, dashboard_layout:list, sdk:LookerEnvironment) -> None:
@@ -91,24 +92,31 @@ class Tile:
                                     filter_for_tile[0].width,
                                     filter_for_tile[0].height)
         return layout
-    
+  
     def get_tile_data(self):
         # Get data for single tile viz
         if self.tile_type == "Tile":
             try:
+                logging.debug(ColorPrint.blue + f"Executing sdk.run_query for tile:{self.tile_name}" + ColorPrint.end)
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.result_maker.query_id,result_format='json'))
                 logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
                 assert "looker_error" not in df.columns.values.astype(str)
                 self.tile_df = df.astype(str)
                 self.tile_df_dimensions = df.shape
             except AssertionError:
+                error_message = "Error in API call, Error in SQL, Looker could not Compile SQL"
                 logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for {self.tile_name}" + ColorPrint.end)
                 self.tile_data_error = True
                 self.looker_error_sdk_message = df.values[0][0]
-            except:
-                logging.warning(ColorPrint.red + f"Error running query, could not retrieve data" + ColorPrint.end)
+            except (json.JSONDecodeError,looker_sdk.rtl.serialize.DeserializeError,looker_sdk.error.SDKError):                
+                error_message = "Error in API call, Empty JSON returned due to HTTPS Timeout Error from tile query type"
+                logging.warning(ColorPrint.red + f"{error_message}" + ColorPrint.end)
                 self.tile_data_error = True
-                self.looker_error_sdk_message = "Error in API call, could not retrieve data"
+                self.looker_error_sdk_message = error_message            
+            except:
+                logging.warning(ColorPrint.red + f"General Error running query, could not retrieve data" + ColorPrint.end)
+                self.tile_data_error = True
+                self.looker_error_sdk_message = "General Error in API call, could not retrieve data"
         # Get data for merged query tile viz
         elif self.tile_type == "Merged Query":
             merge_list = self.sdk.merge_query(self.tile.merge_result_id)
@@ -121,13 +129,18 @@ class Tile:
                     self.tile_merged_dfs.append(df.astype(str))
                     self.tile_merged_dfs_dimensions.append(df.shape)
                 except AssertionError:
-                    logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile" + ColorPrint.end)
+                    logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile from merged query" + ColorPrint.end)
                     self.tile_data_error = True
                     self.looker_error_sdk_message = df.values[0][0]
-                except:
-                    logging.warning(ColorPrint.red + f"Error running query, could not retrieve data" + ColorPrint.end)
+                except (json.JSONDecodeError,looker_sdk.rtl.serialize.DeserializeError,looker_sdk.error.SDKError):
+                    error_message = "Error in API call, Empty JSON returned due to HTTPS Timeout Error from merged query"
+                    logging.warning(ColorPrint.red + f"{error_message}" + ColorPrint.end)
                     self.tile_data_error = True
-                    self.looker_error_sdk_message = "Error in API call, could not retrieve data"
+                    self.looker_error_sdk_message = error_message            
+                except:
+                    logging.warning(ColorPrint.red + f"General Error running query, could not retrieve data" + ColorPrint.end)
+                    self.tile_data_error = True
+                    self.looker_error_sdk_message = "General Error in API call, could not retrieve data"
         elif self.tile_type == "Look":     
             try:
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.look.query.id,result_format='json'))
@@ -138,13 +151,18 @@ class Tile:
                 self.tile_data_dimensions = df.shape # Set the dimensions of the tile based on the underlying data
                 logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
             except AssertionError:
-                logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile" + ColorPrint.end)
+                logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for tile from Look" + ColorPrint.end)
                 self.tile_data_error = True
                 self.looker_error_sdk_message = df.values[0][0]
-            except:
-                logging.warning("Error running following tile:",self.tile_pkey)
+            except (json.JSONDecodeError,looker_sdk.rtl.serialize.DeserializeError,looker_sdk.error.SDKError):
+                error_message = "Error in API call, Empty JSON returned due to HTTPS Timeout Error from Look"
+                logging.warning(ColorPrint.red + f"{error_message}" + ColorPrint.end)
                 self.tile_data_error = True
-                self.looker_error_sdk_message = "Error in API call, could not retrieve data"
+                self.looker_error_sdk_message = error_message            
+            except:
+                logging.warning("General Error attempting to retrieve Look's Data:",self.tile_pkey)
+                self.tile_data_error = True
+                self.looker_error_sdk_message = "General Error in API call, could not retrieve data"
         else:
             logging.info(ColorPrint.yellow + f"Tile: {self.tile_pkey} skipped as not of type 'vis'" + ColorPrint.end)
 

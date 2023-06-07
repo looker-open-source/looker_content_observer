@@ -17,7 +17,6 @@ class LookerEnvironment:
         self.config_file = "looker.ini" if config_file is None else config_file
         self.config_instance = 'Looker' if config_instance is None else config_instance 
         self.sdk = looker_sdk.init40(self.config_file, section =self.config_instance)
-        self.me = self.sdk.me()
         self.environment = environment
 
     def switch_environment(self) -> None:
@@ -62,4 +61,5 @@ class LookerEnvironment:
         """
         print sdk.me() to confirm if sdk is authenticated correctly
         """
-        return f"API Connection to {self.config_instance} with User:{self.me.display_name}-Email:{self.me.email} API Credentials was successful."
+        me = self.sdk.me()
+        return f"API Connection to {self.config_instance} with User:{me.display_name}-Email:{me.email} API Credentials was successful."

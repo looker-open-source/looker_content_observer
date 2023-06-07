@@ -5,8 +5,10 @@ from setups.dashboard_run import run_dashboard_tests
 import logging
 from datetime import datetime
 
-# TODO: Setup a ME() command to authenticate the API credentials
-
+# TODO: Make the flag explicit for CSV
+# TODO: Sanitize the CSV name in case it was added
+# TODO: Update get tile dimensions vs. actual dimensions vs. measures use
+# TODO: Read in a CSV tile names
 # https://stackoverflow.com/questions/34643620/how-can-i-split-my-click-commands-each-with-a-set-of-sub-commands-into-multipl
 
 @click.group(name='run', help="Run the Multi Instance Dashboard Checker")
@@ -58,6 +60,8 @@ def run_all_lco(ctx,
                 test_file:str,
                 csv:bool,
                 csv_name:str):
+                
+
     logging.info("Testing all dashboards")
     dashboard_list = dashboard
     instances = config_instances(looker_file)

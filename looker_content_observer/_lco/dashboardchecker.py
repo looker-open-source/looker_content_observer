@@ -23,6 +23,7 @@ class DashboardChecker(Dashboard):
         - Data is formatted as a dictionary and then appended to self.test_results
         - :returns: dictionary
         """
+        logging.debug(ColorPrint.blue + "Starting dashboard level checks")
         instance_dfs = []
         for instance in self.instances:
             output = []

@@ -69,6 +69,7 @@ class Test:
     
     def get_tile_data(tile:Tile):
         logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
+        logging.debug(ColorPrint.debug + "Sending request to tile class' method get_tile_date()")
         tile.get_tile_data()
         try:
             if tile.tile_type == "Merged Query":
