@@ -52,14 +52,12 @@ class Tile:
                 if self.tile.merge_result_id is not None: 
                     return "Merged Query"
                 # In certain cases, the result_maker will either be None (empty) or contain a query_id
-                elif self.tile.look_id != None and self.tile.result_maker.__dict__.get('query_id') is not None:
+                elif self.tile.look_id != None and self.tile.result_maker.get('query_id') is not None:
                     return "Look"
                 elif self.tile.look_id == None and self.tile.result_maker.__dict__.get('query_id') is not None:
                     return "Tile"
                 else:
                     error_message = "An unknown/unmapped visualization type was encountered, skipping evaluation for Tile."
-                    self.tile_data_error = True
-                    self.looker_error_sdk_message = error_message
                     logging.warning(f"Unmapped vis type tile found:{self.tile}") 
                     return "Unmapped Vis Tile"
             except AttributeError:
@@ -67,8 +65,6 @@ class Tile:
                 logging.warning(ColorPrint.red + f"{error_message}.\n:" + ColorPrint.end)
                 logging.debug(self.tile) 
                 logging.warning(ColorPrint.red + f"Note: Tile will be skipped" + ColorPrint.end)
-                self.tile_data_error = True
-                self.looker_error_sdk_message = error_message
                 return "Unmapped Vis Tile"
 
         elif self.tile.type == 'text':
@@ -106,7 +102,8 @@ class Tile:
                                     filter_for_tile[0].width,
                                     filter_for_tile[0].height)
         return layout
-  
+    
+    # TODO: Break this up into something my DRY
     def get_tile_data(self):
         # Get data for single tile viz
         if self.tile_type == "Tile":
@@ -177,6 +174,11 @@ class Tile:
                 logging.warning("General Error attempting to retrieve Look's Data:",self.tile_pkey)
                 self.tile_data_error = True
                 self.looker_error_sdk_message = "General Error in API call, could not retrieve data"
+        elif self.tile_type == 'Unmapped Vis Tile':
+            error_message = "Unmapped Vis Tile: Underlying Data for Model/Look/Tile likely Missing"
+            logging.warning(ColorPrint.red + error_message + ColorPrint.end)
+            self.tile_data_error = True
+            self.looker_error_sdk_message = error_message            
         else:
             logging.info(ColorPrint.yellow + f"Tile: {self.tile_pkey} skipped as not of type 'vis'" + ColorPrint.end)
 
