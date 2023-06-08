@@ -5,10 +5,11 @@ from setups.dashboard_run import run_dashboard_tests
 import logging
 from datetime import datetime
 
-# TODO: Make the flag explicit for CSV
 # TODO: Sanitize the CSV name in case it was added
-# TODO: Update get tile dimensions vs. actual dimensions vs. measures use
+# TODO: Update get tile dimensions vs. actual dimensions vs. measures
 # TODO: Read in a CSV tile names
+# TODO: Change all to 'content' --d and --l for the different types
+# TODO: 'address' column. map the id to a slug and vice versa
 # https://stackoverflow.com/questions/34643620/how-can-i-split-my-click-commands-each-with-a-set-of-sub-commands-into-multipl
 
 @click.group(name='run', help="Run the Multi Instance Dashboard Checker")
@@ -18,7 +19,7 @@ def run_lco(ctx):
     print("Intializing Run")
 
 # TODO: Turn run_all_lco with options to either read in a list from a file or take in a list from command line
-@run_lco.command("all",help="Run a full test, test all dashboards")
+@run_lco.command("dash",help="Test a dashboard across instances and/or environments, multiple can be tested by chaining multiple -d <dash_1> -d <dash_2> etc..")
 @click.option('-d',
               '--dashboard',
               'dashboard',
@@ -39,19 +40,12 @@ def run_lco(ctx):
               type=click.Path(exists=True), # Validates that file path is valid
               help='Test Configurations Yaml File.',
               default = 'configs/config_tests.yaml')
-@click.option('-csv/-no-csv',
-              '--csv/--no-csv',
+@click.option('-csv',
+              '--csv',
               'csv',
-              type = bool,
-              help='Boolean to output create a csv file. Note specify a --csv-name after using this flag',
-              default = False,
-              required = False)
-@click.option('-csv-name',
-              '--csv-name',
-              'csv_name',
               type = str,
               help='Name of CSV file, default file name will be lco_dashboard_run_all_<date_time_of_run>.csv',
-              default = 'test.csv',
+              default = '',
               required = False)
 @click.pass_context
 def run_all_lco(ctx,
@@ -84,7 +78,7 @@ def run_all_lco(ctx,
             print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
             print(row,"\n")
 
-    if csv: 
+    if csv_name != '': 
         csv_file_name = datetime.now().strftime(f'outputs/{csv_name}_%H_%M_%d_%m_%Y.csv')
         combined_dataframe.to_csv(csv_file_name)
 
