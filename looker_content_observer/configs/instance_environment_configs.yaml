@@ -1,12 +1,5 @@
 - branch: null
   environment: production
-<<<<<<< HEAD
   instance: gcpm234
-=======
-  instance: VM
->>>>>>> 169e085d129d6969adf96a25e39a80f01056b967
   project: null
-- branch: rr_testing_dev_vs_prod
-  environment: dev
-  instance: VM
-  project: looker_ssh
+
