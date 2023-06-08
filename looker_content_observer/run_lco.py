@@ -53,8 +53,6 @@ def run_all_lco(ctx,
                 looker_file:str,
                 test_file:str,
                 csv:str):
-                
-
     logging.info("Testing all dashboards")
     dashboard_list = dashboard
     instances = config_instances(looker_file)
