@@ -24,7 +24,7 @@ $ virtualenv lco
 $ source lco/bin/activate         
 ```
 
-### [2] Install the 'mydvp' package
+### [2] Install the 'lco' package
 ```
 $ pip3 install --editable .  
 ```

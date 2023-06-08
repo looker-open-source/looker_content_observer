@@ -92,7 +92,7 @@ class Dashboard:
                 print(tile.result_maker.query_id)
         else: 
             pass
-    
+    #TODO This appears to be unused code... instead using get_name_of_tile() in tile.py - confirm can delete?
     def get_name_of_tile(self,tile):
         if tile.type == 'button':
             try:
@@ -102,8 +102,11 @@ class Dashboard:
         elif tile.type == 'text':
             return tile.title_text_as_html
         elif tile.type == 'vis':
-            return tile.title
+            # Look tiles store title differently from merge tiles and regular tiles
+            if tile.look_id != None and tile.result_maker.get('query_id') is not None:
+                return tile.look.title
+            else:
+                return tile.title
         else:
             return "Unmapped"
 
-    

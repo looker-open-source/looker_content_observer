@@ -35,9 +35,19 @@ class Tile:
             except: 
                 return "Error with parsing JSON of button"
         elif self.tile.type == 'text':
-            return rename_if_title_none(self.tile.title_text_as_html)
+            # Two types of text tiles - markdown and "text"
+            # TODO still need to do a better job extracting the h1 text from the text tile
+            # Example: [{""type"":""h1"",""children"":[{""text"":""Awesome Title""}],""align"":""center""},{""type"":""p"",""children"":[{""text"":""Very awesome text""}]
+            if self.tile.rich_content_json is None:
+                return rename_if_title_none(self.tile.title_text_as_html)
+            else: 
+                return rename_if_title_none(self.tile.body_text)
         elif self.tile.type == 'vis':
-            return rename_if_title_none(self.tile.title)
+            # Look tiles store title differently from merge tiles and regular tiles
+            if self.tile.look_id != None and self.tile.result_maker.get('query_id') is not None:
+                return rename_if_title_none(self.tile.look.title)
+            else:
+                return rename_if_title_none(self.tile.title)
         else:
             logging.debug(ColorPrint.blue + f"Unampped tile:{self.tile}" + ColorPrint.end)
             return "Unmapped"
