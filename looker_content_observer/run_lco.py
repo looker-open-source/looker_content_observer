@@ -52,8 +52,7 @@ def run_all_lco(ctx,
                 dashboard:list,
                 looker_file:str,
                 test_file:str,
-                csv:bool,
-                csv_name:str):
+                csv:str):
                 
 
     logging.info("Testing all dashboards")
@@ -78,8 +77,8 @@ def run_all_lco(ctx,
             print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
             print(row,"\n")
 
-    if csv_name != '': 
-        csv_file_name = datetime.now().strftime(f'outputs/{csv_name}_%H_%M_%d_%m_%Y.csv')
+    if csv != '': 
+        csv_file_name = datetime.now().strftime(f'outputs/{csv}_%H_%M_%d_%m_%Y.csv')
         combined_dataframe.to_csv(csv_file_name)
 
 
