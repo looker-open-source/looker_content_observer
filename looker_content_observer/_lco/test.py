@@ -1,5 +1,6 @@
 import pandas as pd
 from _lco.dashboard import Dashboard
+from _lco.look import Look
 from _lco.colorprint import ColorPrint
 from _lco.tile import Tile
 import logging
@@ -97,3 +98,6 @@ class Test:
             return f"failed - {tile.looker_error_sdk_message}"
         else:
             return "successful"
+    
+    def get_look_data(look:Look):
+        return None
