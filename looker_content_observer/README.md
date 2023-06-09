@@ -41,7 +41,7 @@ $ pip3 install --editable .
     - For the first time running the script, users should `init` as the first step
   - `lco run`: Commands here will be involved with running the dashboard/Look checkers
     - Run leverages the file created from the init phase 
-- If one instance+branch is added during `init`, the tool will check content against that one instance+branch upon `lco run all`. If two or more are added during `init`, the tool will check and also compare all instance+branch runs to each other during `lco run dash`.
+- If one instance+branch is added during `init`, the tool will check content against that one instance+branch upon `lco run dash`. If two or more are added during `init`, the tool will check and also compare all instance+branch runs to each other during `lco run dash`.
 
 
 
@@ -65,6 +65,7 @@ Skips the guided setup and allows users to enter in the instance + environment i
 - See Recording: TBD
 - Example setting up two runs, one on the production branch of an instance called MyInstance (as named in looker.ini), and a second on the my_dev_branch branch of my_test_project project in the AnotherInstance instance: 
 `lco init cli -i MyInstance production -i AnotherInstance my_test_project::my_dev_branch `
+  - Note: Always use two colons '::' to between the project and branch, i.e. project::branch
 
 ## [2] run
 
