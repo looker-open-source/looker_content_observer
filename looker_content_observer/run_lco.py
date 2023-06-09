@@ -77,7 +77,7 @@ def run_dash_lco(ctx,
             print(row,"\n")
 
     if csv != '': 
-        csv_file_name = datetime.now().strftime(f'outputs/{csv}_%H_%M_%d_%m_%Y.csv')
+        csv_file_name = datetime.now().strftime(f'outputs/dash_{csv}_%H_%M_%d_%m_%Y.csv')
         combined_dataframe.to_csv(csv_file_name)
 
 
@@ -140,7 +140,7 @@ def run_looks_lco(ctx,
             print(row,"\n")
 
     if csv != '': 
-        csv_file_name = datetime.now().strftime(f'outputs/{csv}_%H_%M_%d_%m_%Y.csv')
+        csv_file_name = datetime.now().strftime(f'outputs/look_{csv}_%H_%M_%d_%m_%Y.csv')
         combined_dataframe.to_csv(csv_file_name)
 
 @run_lco.command("me",help="Help confirm if API credentials have been configured correctly per instances")
