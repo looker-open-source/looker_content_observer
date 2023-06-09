@@ -86,8 +86,14 @@ def create_instance_yaml(instances:list) -> yaml:
     # Each instance (dict key) will have payload of instance environment, project, and branch
     logging.info(f"Instances {instances}")
     for instance in instances: 
-        instance_list.append(format_instance_list(instance))  
-    
+        try:
+            instance_list.append(format_instance_list(instance))  
+        except IndexError:
+            logging.warning("Error: Likely caused by Instance+Environment Configuration File")
+            print("Error:Please confirm your Looker 'instance_environment_configs.yaml' file was configured properly")
+            print("-->If setup was from CLI: please confirm the project::branch configuration has 2 colons -> :: between the project and branch.")
+            exit()
+
     with open("configs/instance_environment_configs.yaml","w") as file:
         yaml_file = yaml.dump(instance_list,file) 
 

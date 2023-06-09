@@ -12,7 +12,8 @@ def run_look_tests(look_to_check:list,
     - Retrieves data for each test 
     :returns: each dashboard as element within list, all dashboards combined into a single pandas dataframe 
     """
-    dash_data = []
+    logging.info(ColorPrint.yellow + "Starting Run Look Tests" + ColorPrint.end)
+    look_data = []
     assert tests_to_run.get('look_tests') is not None, f"No key found for dashboard tests, please confirm the config_tests.yaml file is being passed in"
 
     for look_id in look_to_check:
@@ -24,6 +25,6 @@ def run_look_tests(look_to_check:list,
         logging.info(ColorPrint.yellow + f"Applying pandas tests to data" + ColorPrint.end)
         # Apply test of equality
         data['is_data_equal'] = TestResult.is_data_equal(data)
-        dash_data.append(data)
+        look_data.append(data)
     
-    return dash_data, concat([*dash_data], ignore_index=True)
+    return look_data, concat([*look_data], ignore_index=True)
