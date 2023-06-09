@@ -72,6 +72,13 @@ Skips the guided setup and allows users to enter in the instance + environment i
 Running command `run me` will test the 'looker.ini' and 'instance_environment_configs.yaml' files. 
 
 ### [B] dash
-- This runs the Looker Content Observer
-- An example command would be `lco run dash -d 17 --csv mytestresults`. This would run the tool against dashboard 17 and save the results to '/outputs/mytestresults_hh_mm_ss_dd_yyyy' with the suffix containing the time and date of the run in UTC.
+- This runs the Looker Content Observer against a dashboard
+- Set the desired tests in '/config/config_tests.yaml'
+- An example command would be `lco run dash -d 17 -d 18 --csv mydashresults`. This would run the tool against dashboards 17 and 18 and save the results to '/outputs/mydashresults_hh_mm_ss_dd_yyyy' with the suffix containing the time and date of the run in UTC.
+- If run from a different folder than the location of 'looker.ini', the additional command `-f --looker-file-path PATH` is needed 
+
+### [C] look
+- This runs the Looker Content Observer against a Look
+- Set the desired tests in '/config/config_tests.yaml'
+- An example command would be `lco run look -l 17 -l 18 --csv mylookresults`. This would run the tool against Looks 17 and 18 and save the results to '/outputs/mylookresults_hh_mm_ss_dd_yyyy' with the suffix containing the time and date of the run in UTC.
 - If run from a different folder than the location of 'looker.ini', the additional command `-f --looker-file-path PATH` is needed 
