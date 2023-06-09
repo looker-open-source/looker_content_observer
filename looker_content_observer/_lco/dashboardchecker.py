@@ -14,6 +14,7 @@ class DashboardChecker(Dashboard):
         # Contains both dashboard level and tile level tests
         self.tests_to_run = tests_to_run
         self.dashboard_level_tests:list = list(filter(lambda run_test: self.tests_to_run['dashboard_level'][run_test] == True,self.tests_to_run['dashboard_level'])) 
+        self.tile_level_tests:list = list(filter(lambda run_test: self.tests_to_run['tile_level'][run_test] == True,self.tests_to_run['tile_level']))
     
     def get_data_for_test(self) -> list:
         """
