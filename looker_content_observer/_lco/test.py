@@ -20,7 +20,9 @@ class TestResult:
         logging.debug(ColorPrint.blue + f"Shape of DF:{df.shape}" + ColorPrint.end)
         try:
             assert (df.shape[1] - test_index) > 1, f"Test only as one row"
-            return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , df.iloc[:,test_index:].values))
+            return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , 
+                             df.iloc[:,test_index:].values)
+                             )
         except AssertionError:
             return ['N/A'] * df.shape[0]      
 
@@ -99,5 +101,12 @@ class Test:
         else:
             return "successful"
     
-    def get_look_data(look:Look):
-        return None
+    def get_look_data(look:Look,sdk:object):
+        l = Look(look.id)
+        try:
+            look_data = l.get_look_data(look,sdk)
+            assert look_data is not None
+            return pd.util.hash_pandas_object(look_data).sum()
+        except AssertionError:
+            logging.warning(ColorPrint.yellow + f"{l.look_id} contained no data" + ColorPrint.end)
+            return 0

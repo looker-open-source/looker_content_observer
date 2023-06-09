@@ -21,6 +21,8 @@ def run_look_tests(look_to_check:list,
                         instances,
                         tests_to_run['look_tests'])
         data = lc.get_data_for_test()
+        logging.debug(ColorPrint.blue + "Retrieved Look data payload" + ColorPrint.end)
+        logging.debug(data)
         logging.info(ColorPrint.yellow + f"Retrieved data for dash:{look_id} of shape:{data.shape}" + ColorPrint.end)
         logging.info(ColorPrint.yellow + f"Applying pandas tests to data" + ColorPrint.end)
         # Apply test of equality

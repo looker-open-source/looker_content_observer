@@ -34,7 +34,7 @@ class LookChecker(Look):
             for method_to_test, bool_val in self.look_level_tests:
                 logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
                 # Check if test is set to true
-                result_from_test = getattr(Test,method_to_test)(look)
+                result_from_test = getattr(Test,method_to_test)(look,instance.sdk)
                 output.append([instance_environment,
                                look.title,
                                "look",
