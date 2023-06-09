@@ -1,9 +1,10 @@
 import pandas as pd
-from dashboard import Dashboard
-from tile import Tile
+from _lco.dashboard import Dashboard
+from _lco.look import Look
+from _lco.colorprint import ColorPrint
+from _lco.tile import Tile
 import logging
-from colorprint import ColorPrint
-import json
+import numpy as np
 
 class TestResult:
  
@@ -19,7 +20,9 @@ class TestResult:
         logging.debug(ColorPrint.blue + f"Shape of DF:{df.shape}" + ColorPrint.end)
         try:
             assert (df.shape[1] - test_index) > 1, f"Test only as one row"
-            return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , df.iloc[:,test_index:].values))
+            return list(map(lambda values: len(set([tuple(val) if type(val)==list else val for val in values])) ==1  , 
+                             df.iloc[:,test_index:].values)
+                             )
         except AssertionError:
             return ['N/A'] * df.shape[0]      
 
@@ -69,12 +72,11 @@ class Test:
     
     def get_tile_data(tile:Tile):
         logging.info(ColorPrint.yellow + f"Making API call to retrieve tile's dimensions for:{tile.tile_name}" + ColorPrint.end)
-        logging.debug(ColorPrint.debug + "Sending request to tile class' method get_tile_date()")
         tile.get_tile_data()
         try:
             if tile.tile_type == "Merged Query":
                 assert len(tile.tile_merged_dfs) > 0
-                return sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
+                return np.sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
             else:
                 assert tile.tile_df is not None
                 return pd.util.hash_pandas_object(tile.tile_df).sum()
@@ -98,3 +100,13 @@ class Test:
             return f"failed - {tile.looker_error_sdk_message}"
         else:
             return "successful"
+    
+    def get_look_data(look:Look,sdk:object):
+        l = Look(look.id)
+        try:
+            look_data = l.get_look_data(look,sdk)
+            assert look_data is not None
+            return pd.util.hash_pandas_object(look_data).sum()
+        except AssertionError:
+            logging.warning(ColorPrint.yellow + f"{l.look_id} contained no data" + ColorPrint.end)
+            return 0

@@ -1,7 +1,7 @@
 import pandas as pd
 import looker_sdk
 import urllib3
-from colorprint import ColorPrint
+from _lco.colorprint import ColorPrint
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
 
@@ -17,7 +17,6 @@ class LookerEnvironment:
         self.config_file = "looker.ini" if config_file is None else config_file
         self.config_instance = 'Looker' if config_instance is None else config_instance 
         self.sdk = looker_sdk.init40(self.config_file, section =self.config_instance)
-        self.me = self.sdk.me()
         self.environment = environment
 
     def switch_environment(self) -> None:
@@ -62,5 +61,5 @@ class LookerEnvironment:
         """
         print sdk.me() to confirm if sdk is authenticated correctly
         """
-        # TODO: Error handling in case the me() call fails
-        return f"{self.me.__dict__}"
+        me = self.sdk.me()
+        return f"API Connection to {self.config_instance} with User:{me.display_name}-Email:{me.email} API Credentials was successful."
