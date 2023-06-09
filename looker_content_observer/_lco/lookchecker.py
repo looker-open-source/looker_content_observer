@@ -12,7 +12,9 @@ class LookChecker(Look):
         self.instances = instances
         # Contains both dashboard level and tile level tests
         self.tests_to_run = tests_to_run
-        self.tile_level_tests:list = list(filter(lambda run_test: self.tests_to_run['tile_level'][run_test] == True,self.tests_to_run['tile_level']))
+        # self.look_level_tests:list = self.tests_to_run['look_tests']
+        self.look_level_tests:list = list(filter(lambda item:  item[1] == True,self.tests_to_run.items()))
+
     
     def get_data_for_test(self) -> list:
         """
@@ -21,7 +23,7 @@ class LookChecker(Look):
         - Data is formatted as a dictionary and then appended to self.test_results
         - :returns: dictionary
         """
-        logging.debug(ColorPrint.blue + "Starting dashboard level checks")
+        logging.debug(ColorPrint.blue + f"Starting Look level checks: {self.look_level_tests}" + ColorPrint.end)
         instance_dfs = []
         for instance in self.instances:
             output = []
@@ -29,11 +31,12 @@ class LookChecker(Look):
             look = self.get_look(instance.sdk)
             instance_environment = instance.config_instance + "." + instance.environment
             # Run dashboard level tests
-            for method_to_test in self.tile_level_tests:
+            for method_to_test, bool_val in self.look_level_tests:
                 logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
                 # Check if test is set to true
-                result_from_test = getattr(Test,method_to_test)(look)
-                output.append([instance_environment,look.title,
+                result_from_test = getattr(Test,method_to_test)(look,instance.sdk)
+                output.append([instance_environment,
+                               look.title,
                                "look",
                                method_to_test,
                                result_from_test,

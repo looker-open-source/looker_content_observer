@@ -120,9 +120,11 @@ def run_looks_lco(ctx,
     instances = config_instances(looker_file)
     tests = config_tests(test_file)
 
-    print(ColorPrint.green +"Running Tests" + ColorPrint.end)
+    print(ColorPrint.green +"Running Test(s) on Look(s)" + ColorPrint.end)
     # Run tests
-    per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(look_list,instances,tests)
+    per_look_dataframes, combined_dataframe = run_look_tests(look_list,
+                                                                  instances,
+                                                                  tests)
     logging.info(ColorPrint.yellow + f"Combined DataFrame:\n{combined_dataframe}" + ColorPrint.end)
 
     # Logging Errors on rows where the data is not equal between columns
