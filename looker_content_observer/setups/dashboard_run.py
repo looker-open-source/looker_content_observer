@@ -2,8 +2,8 @@ from _lco.dashboardchecker import DashboardChecker
 import logging 
 from _lco.test import TestResult
 from _lco.colorprint import ColorPrint
-import pandas as pd
-pd.set_option('display.max_colwidth', None)
+from pandas import concat
+
 
 
 def run_dashboard_tests(dashboards_to_check:list,
@@ -27,4 +27,4 @@ def run_dashboard_tests(dashboards_to_check:list,
         data['is_data_equal'] = TestResult.is_data_equal(data)
         dash_data.append(data)
     
-    return dash_data, pd.concat([*dash_data], ignore_index=True)
+    return dash_data, concat([*dash_data], ignore_index=True)
