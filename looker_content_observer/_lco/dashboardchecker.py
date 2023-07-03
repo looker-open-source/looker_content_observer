@@ -20,10 +20,9 @@ class DashboardChecker(Dashboard):
     
     def get_data_for_test(self) -> list:
         """
-        - Method largely makes API calls to retrive data to be later used in testing + comparisons
-        - Certain methods require multiple API calls, these are specified in the self.api_methods
-        - Data is formatted as a dictionary and then appended to self.test_results
-        - :returns: dictionary
+        - Makes API calls to retrive data to be later used in testing + comparisons
+        - Certain tests require multiple API calls, these are specified in the self.api_methods
+        - :returns: list of pandas dataframes
         """
         logging.debug(ColorPrint.blue + "Starting dashboard level checks")
         instance_dfs = []
@@ -34,13 +33,17 @@ class DashboardChecker(Dashboard):
             instance_environment = instance.config_instance + "." + instance.environment
             # Run dashboard level tests
             for method_to_test in self.dashboard_level_tests:
+                # Dictionary to keep track of metadata
                 metadata = {"runtime":0}
-                logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
-                # Check if test is set to true
                 start_time = monotonic()
+
+                logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
+                # Run Test
                 result_from_test = getattr(Test,method_to_test)(dash)
+                # Capture runtime
                 duration = monotonic() - start_time                            
                 metadata["runtime"] = round(duration,4)
+                # Append results to output list
                 output.append([instance_environment,dash.title,"dashboard",str(dumps(metadata)),method_to_test,result_from_test])  
 
             # Run tile level tests
@@ -48,17 +51,20 @@ class DashboardChecker(Dashboard):
             for element in dash.dashboard_elements:
                 t = Tile(element,dash.dashboard_layouts,instance.sdk)
                 for tile_method_to_test in self.tile_level_tests:
-                    # Check if test is set to true
+                    # Dictionary to keep track of metadata
                     metadata = {"runtime":0}
                     start_time = monotonic()
+                    # Run Test
                     result_from_test = getattr(Test,tile_method_to_test)(t)
                     logging.debug(ColorPrint.blue + f"Result from test: {result_from_test} for test-{tile_method_to_test}" + ColorPrint.end)
+                    # Capture runtime
                     duration = monotonic() - start_time                            
                     metadata['runtime'] = round(duration,4)
+                    # Append data to output list
                     output.append([instance_environment,dash.title,f"tile-{t.tile_pkey}",str(dumps(metadata)),tile_method_to_test,result_from_test])     
             instance_dfs.append(DataFrame(output,columns =['instance_environment','dashboard_title','level','metadata','test','test_result']))
 
-        # Merge, via outer join, the dataframes together
+        # Combined multiple dataframes together, logic 'reduces' multiple dataframes down to a single merged final output
         if len(instance_dfs) > 1:
             combined = reduce(lambda left,right: merge(left, right, on=['dashboard_title','level','test'], how='outer'), [*instance_dfs])
             instance_dfs.append(combined[sorted(combined.columns)])
