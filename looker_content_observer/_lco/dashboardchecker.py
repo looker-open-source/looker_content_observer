@@ -2,7 +2,9 @@ from _lco.dashboard import Dashboard
 from _lco.colorprint import ColorPrint
 from _lco.test import Test
 from _lco.tile import Tile
-import pandas as pd
+from pandas import DataFrame,merge
+from time import monotonic
+from json import dumps
 from functools import reduce
 import logging
 
@@ -32,10 +34,14 @@ class DashboardChecker(Dashboard):
             instance_environment = instance.config_instance + "." + instance.environment
             # Run dashboard level tests
             for method_to_test in self.dashboard_level_tests:
+                metadata = {"runtime":0}
                 logging.info(ColorPrint.yellow + f"Runnings tests on following method: {method_to_test}" + ColorPrint.end)
                 # Check if test is set to true
+                start_time = monotonic()
                 result_from_test = getattr(Test,method_to_test)(dash)
-                output.append([instance_environment,dash.title,"dashboard",method_to_test,result_from_test])  
+                duration = monotonic() - start_time                            
+                metadata["runtime"] = round(duration,4)
+                output.append([instance_environment,dash.title,"dashboard",str(dumps(metadata)),method_to_test,result_from_test])  
 
             # Run tile level tests
             logging.info(ColorPrint.yellow + f"Runnings tile level tests: {self.tile_level_tests}" + ColorPrint.end)
@@ -43,15 +49,18 @@ class DashboardChecker(Dashboard):
                 t = Tile(element,dash.dashboard_layouts,instance.sdk)
                 for tile_method_to_test in self.tile_level_tests:
                     # Check if test is set to true
+                    metadata = {"runtime":0}
+                    start_time = monotonic()
                     result_from_test = getattr(Test,tile_method_to_test)(t)
                     logging.debug(ColorPrint.blue + f"Result from test: {result_from_test} for test-{tile_method_to_test}" + ColorPrint.end)
-                    # if key exists
-                    output.append([instance_environment,dash.title,f"tile-{t.tile_pkey}",tile_method_to_test,result_from_test])     
-            instance_dfs.append(pd.DataFrame(output,columns =['instance_environment','dashboard_title','level','test','test_result']))
+                    duration = monotonic() - start_time                            
+                    metadata['runtime'] = round(duration,4)
+                    output.append([instance_environment,dash.title,f"tile-{t.tile_pkey}",str(dumps(metadata)),tile_method_to_test,result_from_test])     
+            instance_dfs.append(DataFrame(output,columns =['instance_environment','dashboard_title','level','metadata','test','test_result']))
 
         # Merge, via outer join, the dataframes together
         if len(instance_dfs) > 1:
-            combined = reduce(lambda left,right: pd.merge(left, right, on=['dashboard_title','level','test'], how='outer'), [*instance_dfs])
+            combined = reduce(lambda left,right: merge(left, right, on=['dashboard_title','level','test'], how='outer'), [*instance_dfs])
             instance_dfs.append(combined[sorted(combined.columns)])
                 
         return instance_dfs[-1] 
