@@ -22,7 +22,7 @@ class DashboardChecker(Dashboard):
         """
         - Makes API calls to retrive data to be later used in testing + comparisons
         - Certain tests require multiple API calls, these are specified in the self.api_methods
-        - :returns: list of pandas dataframes
+        - :returns: list containing pandas dataframe
         """
         logging.debug(ColorPrint.blue + "Starting dashboard level checks")
         instance_dfs = []
@@ -44,8 +44,13 @@ class DashboardChecker(Dashboard):
                 duration = monotonic() - start_time                            
                 metadata["runtime"] = round(duration,4)
                 # Append results to output list
-                output.append([instance_environment,dash.title,"dashboard",str(dumps(metadata)),method_to_test,result_from_test])  
-
+                output.append([instance_environment,
+                               dash.title,
+                               "dashboard",
+                               str(dumps(metadata)),
+                               method_to_test,
+                               result_from_test]
+                               )  
             # Run tile level tests
             logging.info(ColorPrint.yellow + f"Runnings tile level tests: {self.tile_level_tests}" + ColorPrint.end)
             for element in dash.dashboard_elements:
@@ -62,7 +67,16 @@ class DashboardChecker(Dashboard):
                     metadata['runtime'] = round(duration,4)
                     # Append data to output list
                     output.append([instance_environment,dash.title,f"tile-{t.tile_pkey}",str(dumps(metadata)),tile_method_to_test,result_from_test])     
-            instance_dfs.append(DataFrame(output,columns =['instance_environment','dashboard_title','level','metadata','test','test_result']))
+            instance_dfs.append(DataFrame(output,
+                                          columns =['instance_environment',
+                                                    'dashboard_title',
+                                                    'level',
+                                                    'metadata',
+                                                    'test',
+                                                    'test_result'
+                                                    ]
+                                        )
+                                )
 
         # Combined multiple dataframes together, logic 'reduces' multiple dataframes down to a single merged final output
         if len(instance_dfs) > 1:
