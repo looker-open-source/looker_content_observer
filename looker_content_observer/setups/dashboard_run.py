@@ -26,5 +26,5 @@ def run_dashboard_tests(dashboards_to_check:list,
         # Apply test of equality
         data['is_data_equal'] = TestResult.is_data_equal(data)
         dash_data.append(data)
-    
+    # Combine all dataframes together
     return dash_data, concat([*dash_data], ignore_index=True)

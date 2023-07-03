@@ -8,34 +8,36 @@ class Dashboard:
 
     def get_dashboard(self, sdk:object) -> list:
         """
+        :docs: https://developers.looker.com/api/explorer/4.0/methods/Dashboard/dashboard?sdk=py&s=dashboard
+        :returns: API call from get dashboard endpoint
         """ 
         return sdk.dashboard(self.dashboard_id)
 
     def get_dashboard_layout(self,sdk:object) -> list: 
+        """
+        :docs: https://developers.looker.com/api/explorer/4.0/methods/Dashboard/dashboard_dashboard_layouts?sdk=py&s=dashboard_dashboard_layouts
+        :returns: API call from get dashboard layout endpoint
+        """ 
         return sdk.dashboard_dashboard_layouts(self.dashboard_id)
 
     def get_all_dashboard_elements(self, sdk:object) -> list:
         """
+        :docs: https://developers.looker.com/api/explorer/4.0/methods/Dashboard/dashboard_dashboard_elements?sdk=py&s=elements 
         :returns: All tile infromation from a dashboard (based on the dashboard id)
-        - Example: https://my.looker.com19999/dashboards/4 -> dashboard_id = '4'
         """ 
         return sdk.dashboard_dashboard_elements(self.dashboard_id)
 
     def sort_all_columns(self,df) -> pd.DataFrame:
         """
-        overview:
         - Helper function to help ensure the dataframe is sorted in the same order
-        :returns:
-        - Asc. Sorted dataframe
+        :returns: Sorted dataframe in ascending order
         """
         return df.sort_values(by=df.columns.tolist())
     
     def get_all_tiles_data(self,sdk:object) -> list:
         """
-        overview:
         - Retrieves the underlying data for a tile, all tiles are turned into separate dataframes and appended to a list 
-        :returns:
-        - list of dataframes
+        - :returns: list of dataframes
         """
         try:
             tiles_in_dashboard = self.get_all_dashboard_elements(sdk)
@@ -80,7 +82,6 @@ class Dashboard:
         
     def map_tile(self,sdk:object,tile):
         """
-        overview: 
         - Depending on if the tile is from a LookML dashboard or UDF, the parameters and methods to retrieve the data from the dashboard are differnet
         """
         if tile.result_maker:
