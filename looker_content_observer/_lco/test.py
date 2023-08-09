@@ -111,13 +111,12 @@ class Test:
             return pd.util.hash_pandas_object(look_data).sum()
         except AssertionError:
             logging.warning(ColorPrint.yellow + f"{l.look_id} contained no data" + ColorPrint.end)
-            # print(l.looker_error_sdk_message)
-            look_data = l.looker_error_sdk_message
+            print(l.looker_error_sdk_message)
             return 0
         
-
     def get_look_api_success(look:Look,sdk:object):
         l = Look(look.id)
+        l.get_look_data(look,sdk)
         if l.look_data_error:
             return f"failed - {l.looker_error_sdk_message}"
         else:
