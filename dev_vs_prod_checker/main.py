@@ -6,9 +6,9 @@ import logging,configparser,argparse,yaml
 from colorprint import ColorPrint
 import pandas as pd
 pd.set_option('display.max_colwidth', None)
-dashboard_list = ["2","jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
+# dashboard_list = ["2","jhu_covid::jhu_base_template_extend","jhu_covid::sample_dashboard"]
 # dashboard_list = ["4837","1257"]
-# dashboard_list = ["13"]#"data_block_acs_bigquery::testing_dashboard"] #13,"data_block_acs_bigquery::acs_census_overview"]
+dashboard_list = ["16"]#"data_block_acs_bigquery::testing_dashboard"] #13,"data_block_acs_bigquery::acs_census_overview"]
 # look_list = ["13","14"]
 
 def setup() -> dict:

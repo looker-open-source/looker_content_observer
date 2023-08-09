@@ -29,6 +29,7 @@ class Look:
                 return df.astype(str)
             except AssertionError:
                 error_message = "Error in API call, Error in SQL, Looker could not Compile SQL"
+                logging.warning(ColorPrint.red + f"{error_message}.\n:" + ColorPrint.end)
                 logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for {self.look_id}" + ColorPrint.end)
                 self.look_data_error = True
                 self.looker_error_sdk_message = df.values[0][0]
