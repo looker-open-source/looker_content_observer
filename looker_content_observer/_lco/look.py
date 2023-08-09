@@ -32,7 +32,7 @@ class Look:
                 logging.warning(ColorPrint.red + f"{error_message}.\n:" + ColorPrint.end)
                 logging.warning(ColorPrint.red + f"Looker SDK Error in SQL for {self.look_id}" + ColorPrint.end)
                 self.look_data_error = True
-                self.looker_error_sdk_message = df.looker_error
+                self.looker_error_sdk_message = df.values[0][0]
             except (JSONDecodeError,rtl.serialize.DeserializeError,error.SDKError):                
                 error_message = "Error in API call, Empty JSON returned due to HTTPS Timeout Error from tile query type"
                 logging.warning(ColorPrint.red + f"{error_message}" + ColorPrint.end)

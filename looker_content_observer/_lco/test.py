@@ -76,12 +76,16 @@ class Test:
         try:
             if tile.tile_type == "Merged Query":
                 assert len(tile.tile_merged_dfs) > 0
-                # return np.sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
-                return np.sum([tile_df for tile_df in tile.tile_merged_dfs])
+                return np.sum([pd.util.hash_pandas_object(tile_df).sum() for tile_df in tile.tile_merged_dfs])
+                # TODO: Better not-hashed result handling
+                # use below for returning not-hashed result
+                # return np.sum([tile_df for tile_df in tile.tile_merged_dfs])
             else:
                 assert tile.tile_df is not None
-                # return pd.util.hash_pandas_object(tile.tile_df).sum()
-                return tile.tile_df
+                return pd.util.hash_pandas_object(tile.tile_df).sum()
+                # TODO: Better not-hashed result handling
+                # use below for returning not-hashed result
+                # return tile.tile_df
         except AssertionError:
             logging.warning(ColorPrint.yellow + f"{tile.tile_name} contained no data" + ColorPrint.end)
             return 0
