@@ -1,3 +1,5 @@
+#License Header
+
 from _lco.lookchecker import LookChecker
 import logging 
 from _lco.test import TestResult

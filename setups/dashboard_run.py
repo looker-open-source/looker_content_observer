@@ -1,3 +1,5 @@
+#License Header
+
 from _lco.dashboardchecker import DashboardChecker
 import logging 
 from _lco.test import TestResult

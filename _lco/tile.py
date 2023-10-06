@@ -1,3 +1,5 @@
+#License Header
+
 import pandas as pd
 from _lco.colorprint import ColorPrint
 from _lco.lookerenvironment import LookerEnvironment

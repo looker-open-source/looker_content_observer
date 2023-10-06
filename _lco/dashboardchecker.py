@@ -1,3 +1,5 @@
+#License Header
+
 from _lco.dashboard import Dashboard
 from _lco.colorprint import ColorPrint
 from _lco.test import Test

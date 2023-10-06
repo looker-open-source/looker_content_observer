@@ -1,3 +1,5 @@
+#License Header
+
 class ColorPrint:
     blue = '\033[94m'
     cyan = '\033[96m'

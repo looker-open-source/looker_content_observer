@@ -1,3 +1,5 @@
+#License Header
+
 from pandas import read_json, DataFrame
 from _lco.colorprint import ColorPrint
 import logging

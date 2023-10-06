@@ -1,3 +1,5 @@
+#License Header
+
 import pandas as pd
 from _lco.dashboard import Dashboard
 from _lco.look import Look

@@ -56,7 +56,7 @@ Run setup via user inputs within the command line. Unless you are frequently swi
 #### `Setup` Flow
 
 
-- See Recording: **[lco init](https://screencast.googleplex.com/cast/NjQ3NDc0MTcxMjk0NTE1MnwwNzE1ZDllZC00Ng)**
+- See Recording: **[lco init](https://github.com/looker_open_source/looker_content_observer/screenshots/init_two_ways_for_LCO.webm)**
 
 ### [B] CLI
 Skips the guided setup and allows users to enter in the instance + environment information as command line args. For users running automated bash type scripts, this will likely be the preferred method if they are switching between branches, projects, and instances frequently.

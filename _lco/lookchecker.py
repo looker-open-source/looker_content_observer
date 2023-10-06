@@ -1,3 +1,5 @@
+#License Header
+
 from _lco.look import Look
 from _lco.colorprint import ColorPrint
 from _lco.test import Test
