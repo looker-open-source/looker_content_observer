@@ -70,7 +70,7 @@ Skips the guided setup and allows users to enter in the instance + environment i
 ## [2] run
 
 ### [A] me
-Running command `run me` will test the 'looker.ini' and 'instance_environment_configs.yaml' files. 
+Running command `lco run me` will test the 'looker.ini' and 'instance_environment_configs.yaml' files. 
 
 ### [B] dash
 - This runs the Looker Content Observer against a dashboard
@@ -83,3 +83,20 @@ Running command `run me` will test the 'looker.ini' and 'instance_environment_co
 - Set the desired tests in '/config/config_tests.yaml'
 - An example command would be `lco run look -l 17 -l 18 --csv mylookresults`. This would run the tool against Looks 17 and 18 and save the results to '/outputs/mylookresults_hh_mm_ss_dd_yyyy' with the suffix containing the time and date of the run in UTC.
 - If run from a different folder than the location of 'looker.ini', the additional command `-f --looker-file-path PATH` is needed 
+
+# Logging
+Additional command logs can be added to track and trace API calls at the logging levels of ['debug', 'info','critical']. 
+
+For example to add debug logging to the `lco run me` connectivity test: 
+```
+$ lco -l debug run me         
+```
+
+Example of adding `info` level logging to the dashboard comparison test:
+```
+$ lco -l info run dash -d 4 --csv my_test.csv         
+```
+
+Note the logging level must be chosen prior to any of the CLI Flows command line arguments, i.e. `--logging` comes **before** the `lco init` or `lco run` commands.
+
+For more information, the underlying logging module which was used can be found here: [Logging facility for Python](https://docs.python.org/3/library/logging.html)
