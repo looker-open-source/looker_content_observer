@@ -36,6 +36,7 @@ $ pip3 install --editable .
 
 ### [3] Confirm Initial Packages
 Run `pip3 list`
+
 ![install_pic](screenshots/fresh_install_pip_list.png)
 
 
