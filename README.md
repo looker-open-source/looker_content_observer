@@ -1,5 +1,10 @@
 # Looker Content Observer (LCO)
 
+# Description
+This tool is intended to support the automated checking of content in Looker (dashboards and looks), and the queries which underly them. Run it pointed toward a single environment (an environment is an instance+project+branch) and find SQL or LookML errors, results of null or zero, and various formatting details like a count of dashboard filters and tiles. Run it against two environments simultaneously and compare those attritbutes, flagging differences. Use cases include:
+- Quality assurance during a data warehouse or Looker instance migration
+- Flagging diffs in content during a Lookml Pull Request process
+
 # Quickstart
 
 ## [Pre-Step] looker.ini File
@@ -30,6 +35,7 @@ $ pip3 install --editable .
 ```
 
 ### [3] Confirm Initial Packages
+Run `pip3 list`
 ![install_pic](screenshots/fresh_install_pip_list.png)
 
 
@@ -100,3 +106,19 @@ $ lco -l info run dash -d 4 --csv my_test.csv
 Note the logging level must be chosen prior to any of the CLI Flows command line arguments, i.e. `--logging` comes **before** the `lco init` or `lco run` commands.
 
 For more information, the underlying logging module which was used can be found here: [Logging facility for Python](https://docs.python.org/3/library/logging.html)
+=======
+For more information, the underlying logging module which was used can be found here: [Logging facility for Python](https://docs.python.org/3/library/logging.html)
+
+# Additional Info
+
+## Parallelization 
+The current version does not run multiple pieces of content in parallel (nor the queries inside them). To run content in parallel, some have had success wrapping with a tool like parallel shell (pdsh).
+
+## Content Comparison
+The current version does a simple (probably too simple) comparison between content when two environments are specified. The tool takes the query result, considers it as a string, hashes it, and compares that hash. This means that differences in a query's sort order (or when there is none specified) or tiny numerical differences (e.g. 1.0000001 and 0.99999999) are very different when considered as strings.
+
+## Hashed Values of Note
+The LCO reports query results in a hashed form. Some common results are noted below. This information has proven useful during data warehouse migration when a table might exist (no SQL error) but one or more colums are unpopulated. 
+- No Results: "0"
+- Zero: "-7595641802909918067"
+- Null: "2661365147313949563"
