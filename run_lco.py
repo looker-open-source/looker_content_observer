@@ -21,11 +21,8 @@ import logging
 from pandas import set_option as pd_set_option
 from datetime import datetime
 
-# TODO: Sanitize the CSV name in case it was added
-# TODO: Update get tile dimensions vs. actual dimensions vs. measures
-# TODO: Read in a CSV tile names
-# TODO: Change all to 'content' --d and --l for the different types
-# TODO: 'address' column. map the id to a slug and vice versa
+
+# TODO: Scheduled changes - change all to 'content' --d and --l for the different types
 # https://stackoverflow.com/questions/34643620/how-can-i-split-my-click-commands-each-with-a-set-of-sub-commands-into-multipl
 
 @click.group(name='run', help="Run the Multi Instance Dashboard Checker")
@@ -91,9 +88,10 @@ def run_dash_lco(ctx,
             print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
             print(row,"\n")
 
-    if csv != '': 
-        csv_file_name = datetime.now().strftime(f'outputs/dash_{csv}_%H_%M_%d_%m_%Y.csv')
-        combined_dataframe.to_csv(csv_file_name)
+    if csv != '':
+        format_csv_string = lambda csv_string: csv_string.split(".")[0] if '.csv' in csv_string else csv_string   
+        csv_file_name = datetime.now().strftime(f'outputs/dash_{format_csv_string(csv)}_%Y-%m-%d_%H%M%S.csv')
+        combined_dataframe.to_csv(csv_file_name, index = False)
 
 
 @run_lco.command("look",help="Test a Look across instances and/or environments, multiple can be tested by chaining multiple -l <look_1> -l <look_2> etc..")
@@ -155,8 +153,9 @@ def run_looks_lco(ctx,
             print(row,"\n")
 
     if csv != '':
-        csv_file_name = datetime.now().strftime(f'outputs/look_{csv}_%H_%M_%d_%m_%Y.csv')
-        combined_dataframe.to_csv(csv_file_name)
+        format_csv_string = lambda csv_string: csv_string.split(".")[0] if '.csv' in csv_string else csv_string   
+        csv_file_name = datetime.now().strftime(f'outputs/dash_{format_csv_string(csv)}_%Y-%m-%d_%H%M%S.csv')
+        combined_dataframe.to_csv(csv_file_name, index=False)
 
 @run_lco.command("me",help="Help confirm if API credentials have been configured correctly per instances")
 @click.option('-f',
