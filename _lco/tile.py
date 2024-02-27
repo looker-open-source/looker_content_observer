@@ -134,7 +134,7 @@ class Tile:
             try:
                 logging.debug(ColorPrint.blue + f"Executing sdk.run_query for tile:{self.tile_name}" + ColorPrint.end)
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.result_maker.query_id,result_format='json'))
-                logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
+                logging.info(ColorPrint.yellow + f"Tile had following columns and rows:{df.shape}" + ColorPrint.end)
                 assert "looker_error" not in df.columns.values.astype(str)
                 self.tile_df = df.astype(str)
                 self.tile_df_dimensions = df.shape
@@ -158,7 +158,6 @@ class Tile:
             for source_query in merge_list.source_queries:
                 try: 
                     df = pd.read_json(self.sdk.run_query(query_id=source_query.query_id,result_format='json'))
-                    logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
                     logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
                     assert "looker_error" not in df.columns.values
                     self.tile_merged_dfs.append(df.astype(str))
@@ -179,7 +178,6 @@ class Tile:
         elif self.tile_type == "Look":     
             try:
                 df = pd.read_json(self.sdk.run_query(query_id=self.tile.look.query.id,result_format='json'))
-                logging.info(ColorPrint.yellow + f"Tile had following data:{df.head()}" + ColorPrint.end)
                 logging.info(ColorPrint.yellow + f"Tile had following shape:{df.shape}" + ColorPrint.end)
                 assert "looker_error" not in df.columns.values
                 self.tile_df = df.astype(str)
