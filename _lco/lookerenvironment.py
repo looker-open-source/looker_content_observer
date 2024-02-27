@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pandas as pd
-import looker_sdk
-import urllib3
+from looker_sdk import init40 
+from urllib3 import disable_warnings,exceptions 
 from _lco.colorprint import ColorPrint
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
+disable_warnings(exceptions.InsecureRequestWarning) # Disabling https warning (self-signed warning), remove when accessing your own endpoint
 
 class LookerEnvironment:
     """
@@ -30,7 +29,7 @@ class LookerEnvironment:
     def __init__(self, environment:str, config_file:str=None, config_instance:str = None) -> None:
         self.config_file = "looker.ini" if config_file is None else config_file
         self.config_instance = 'Looker' if config_instance is None else config_instance 
-        self.sdk = looker_sdk.init40(self.config_file, section =self.config_instance)
+        self.sdk = init40(self.config_file, section =self.config_instance)
         self.environment = environment
 
     def switch_environment(self) -> None:
