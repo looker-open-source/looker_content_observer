@@ -18,6 +18,7 @@ from setups.instance_config import config_instances,config_tests
 from setups.dashboard_run import run_dashboard_tests
 from setups.look_run import run_look_tests
 import logging
+from pandas import set_option as pd_set_option
 from datetime import datetime
 
 # TODO: Sanitize the CSV name in case it was added
@@ -76,8 +77,8 @@ def run_dash_lco(ctx,
     print(ColorPrint.green +"Running Tests" + ColorPrint.end)
     # Run tests
     per_dashboard_dataframes, combined_dataframe = run_dashboard_tests(dashboard_list,instances,tests)
+    pd_set_option('display.max_columns', None)
     logging.info(ColorPrint.yellow + f"Combined DataFrame:\n{combined_dataframe}" + ColorPrint.end)
-
     # Logging Errors on rows where the data is not equal between columns
     for key,row in combined_dataframe[combined_dataframe['is_data_equal'] == False].iterrows():
         print(ColorPrint.red + "Error on following test:" + ColorPrint.end)
@@ -153,7 +154,7 @@ def run_looks_lco(ctx,
             print(ColorPrint.red + "Failed retrieving API:" + ColorPrint.end)
             print(row,"\n")
 
-    if csv != '': 
+    if csv != '':
         csv_file_name = datetime.now().strftime(f'outputs/look_{csv}_%H_%M_%d_%m_%Y.csv')
         combined_dataframe.to_csv(csv_file_name)
 
