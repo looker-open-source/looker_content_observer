@@ -16,7 +16,12 @@ import pandas as pd
 from _lco.colorprint import ColorPrint
 import json
 
-class Dashboard: 
+class Dashboard:
+    """
+    Overivew:
+    - Managed methods relating to retrieving data from dashboards
+    - Methods involve with getting either the data or metadata regarding dashboards and the underlying tiles and looks    
+    """
     def __init__(self,dashboard_id:str) -> None:
         self.dashboard_id = dashboard_id
 
