@@ -66,13 +66,15 @@ Run setup via user inputs within the command line. Unless you are frequently swi
 
 ##### `Setup` Flow
 
-
+- Run `lco init setup`
 - See Recording: **[lco init](https://github.com/looker_open_source/looker_content_observer/screenshots/init_two_ways_for_LCO.webm)**
 
 #### [B] CLI
+
 Skips the guided setup and allows users to enter in the instance + environment information as command line args. For users running automated bash type scripts, this will likely be the preferred method if they are switching between branches, projects, and instances frequently.
 
 #####  `CLI` Flow
+- Run `lco init cli`
 - See Recording: TBD
 - Example setting up two runs, one on the production branch of an instance called MyInstance (as named in looker.ini), and a second on the my_dev_branch branch of my_test_project project in the AnotherInstance instance: 
 `lco init cli -i MyInstance production -i AnotherInstance my_test_project::my_dev_branch `
@@ -110,7 +112,7 @@ $ lco -l info run dash -d 4 --csv my_test.csv
 
 Note the logging level must be chosen prior to any of the CLI Flows command line arguments, i.e. `--logging` comes **before** the `lco init` or `lco run` commands.
 
-Also note, that when debug or info log levels are chosen, query results will appear unhashed in the command line interface. This presents the chance for query results to be captured using a means contrived by the user (see note on Parallelization below), but it also presents a chance for query results to be seen or saved outside the Looker interface.
+Also note that when debug or info log levels are chosen, then query runtimes are included. This can be useful in comparing not only results but also performance between environments.
 
 For more information, the underlying logging module which was used can be found here: [Logging facility for Python](https://docs.python.org/3/library/logging.html)
 
