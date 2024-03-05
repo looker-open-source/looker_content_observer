@@ -1,4 +1,4 @@
-# Looker Content Observer (LCO)
+# Looker Content Observer (LCO) 
 
 ## Notice
 
