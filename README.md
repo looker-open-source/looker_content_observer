@@ -2,7 +2,7 @@
 
 ## Notice
 
-The Looker Content Observer is NOT officially supported by Looker. Please do not contact Looker support for issues with LCO. Issues may be reported via the [Issues](https://github.com/looker-open-source/looker-content-observer/issues) tracker, but no SLA or warranty exists that they will be resolved. 
+The Looker Content Observer is NOT officially supported by Looker. Please do not contact Looker support for issues with LCO. Issues may be reported via the [Issues](https://github.com/looker-open-source/looker_content_observer/issues) tracker, but no SLA or warranty exists that they will be resolved. 
 
 ## Description
 This tool is intended to support the automated checking of content in Looker (dashboards and looks), and the queries which underly them. Run it pointed toward a single environment (an environment is an instance+project+branch) and find SQL or LookML errors, results of null or zero, and various formatting details like a count of dashboard filters and tiles. Run it against two environments simultaneously and compare those attritbutes, flagging differences. Use cases include:
@@ -138,19 +138,19 @@ The LCO reports query results in a hashed form. Some common results are noted be
 
 ### License
 
-LCO is Copyright (c) 2024 Looker Data Sciences, Inc. and is licensed under the Apache License. See [LICENSE.txt](https://github.com/looker-open-source/looker-content-observer/blob/master/LICENSE) for license details.
+LCO is Copyright (c) 2024 Looker Data Sciences, Inc. and is licensed under the Apache License. See [LICENSE.txt](https://github.com/looker-open-source/looker_content_observer/blob/master/LICENSE) for license details.
 
 ### Support
 
-The Looker Content Observer is NOT officially supported by Looker. Please do not contact Looker support for issues with LCO. Issues may be reported via the [Issues](https://github.com/looker-open-source/looker-content-observer/issues) tracker, but no SLA or warranty exists that they will be resolved. 
+The Looker Content Observer is NOT officially supported by Looker. Please do not contact Looker support for issues with LCO. Issues may be reported via the [Issues](https://github.com/looker-open-source/looker_content_observer/issues) tracker, but no SLA or warranty exists that they will be resolved. 
 
 ### Authors
 
-The Looker Content Observer has primarily been developed by [Ryan Rezvani](https://github.com/ryanrezvani) and [Andy Crutchfield](https://github.com/ajcrutch). It was inspired by a similar tool created by [Greg Li](https://github.com/gregli) and [Adam Minton](https://github.com/adamminton). See [all contributors](https://github.com/looker-open-source/looker-content-observer/graphs/contributors)
+The Looker Content Observer has primarily been developed by [Ryan Rezvani](https://github.com/ryanrezvani) and [Andy Crutchfield](https://github.com/ajcrutch). It was inspired by a similar tool created by [Greg Li](https://github.com/gregli) and [Adam Minton](https://github.com/adamminton). See [all contributors](https://github.com/looker-open-source/looker_content_observer/graphs/contributors)
 
 ### Contributing
 
-Bug reports and pull requests are welcome on GitHub at [https://github.com/looker-open-source/looker-content-observer](https://github.com/looker-open-source/looker-content-observer).
+Bug reports and pull requests are welcome on GitHub at [https://github.com/looker-open-source/looker_content_observer](https://github.com/looker-open-source/looker_content_observer).
 
 ### Code of Conduct
 
