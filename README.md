@@ -5,7 +5,7 @@
 The Looker Content Observer is NOT officially supported by Looker. Please do not contact Looker support for issues with LCO. Issues may be reported via the [Issues](https://github.com/looker-open-source/looker_content_observer/issues) tracker, but no SLA or warranty exists that they will be resolved. 
 
 ## Description
-This tool is intended to support the automated checking of content in Looker (dashboards and looks), and the queries which underly them. Run it pointed toward a single environment (an environment is an instance+project+branch) and find SQL or LookML errors, results of null or zero, and various formatting details like a count of dashboard filters and tiles. Run it against two environments simultaneously and compare those attritbutes, flagging differences. Use cases include:
+This tool is intended to support the automated checking of content in Looker (dashboards and looks), and the queries which underly them. Run it pointed toward a single environment (an environment is an instance+project+branch) and find SQL or LookML errors, results of null or zero, and various formatting details like a count of dashboard filters and tiles. Run it against two (or more) environments simultaneously and compare those attritbutes, flagging differences. Use cases include:
 - Quality assurance during a data warehouse or Looker instance migration
 - Flagging diffs in content during a Lookml Pull Request process
 
