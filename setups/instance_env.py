@@ -17,10 +17,6 @@ import logging
 import configparser
 import os.path
 
-# TODO: Add in input sanization methods
-def input_sanization():
-    pass
-
 # Looker file typically more sensitive
 def _read_sections(looker_file:os.path) -> list:
     config = configparser.ConfigParser()
