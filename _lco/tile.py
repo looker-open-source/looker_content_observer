@@ -15,6 +15,8 @@
 import pandas as pd
 from _lco.colorprint import ColorPrint
 from _lco.lookerenvironment import LookerEnvironment
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 import json
 import logging
 import looker_sdk
