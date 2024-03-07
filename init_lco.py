@@ -15,15 +15,16 @@
 import click
 import logging
 from setups.instance_env import add_environment,create_instance_yaml
+from _lco.colorprint import ColorPrint
 
 @click.group(name="init",help="Setup for instances and environments")
 @click.pass_context
 def init_lco(ctx):
     logging.basicConfig(level=getattr(logging,ctx.obj['LOGGING']))
-    print("Initialize Init")
+    print(ColorPrint.yellow + "Starting init for Looker Content Observer" + ColorPrint.end)
 
 
-@init_lco.command("setup",help="Run setup via interface")
+@init_lco.command("setup",help="Use this if first time, runs a guided setup wizard")
 @click.pass_context
 @click.option('-f',
               '--file-path',
@@ -40,7 +41,7 @@ def setup(ctx,looker_file):
 
 
 @init_lco.command("cli",
-                    help="Skip setup steps and enter information via command line args")
+                    help="Skips setup wizard and allows setup via command line args")
 @click.option('-i',
               '--instances',
               'instances',

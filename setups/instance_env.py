@@ -45,9 +45,9 @@ def add_environment(add_instance:str = 'y',looker_file = "looker.ini") -> list:
         print("No looker.ini (or equivalent) configuration file found, please create one first before using tool")
         exit()
     
-    print("Enter section name for Looker Instance")
-    print("Note: Section name comes from the looker.ini file.")
-    print("Current section names are:",sections)
+    print("Enter section name for the Looker Instance")
+    print("Note: Section names come from the looker.ini file and are case sensitive, see looker_example.ini for examples")
+    print("Current section names from looker.ini file are:",sections)
 
     # TODO: Add link to documentation for an example
     while add_instance == 'y':
