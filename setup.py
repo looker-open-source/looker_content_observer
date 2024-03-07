@@ -18,6 +18,7 @@ setup(
     name='lco',
     version='0.0.1',
     py_modules=['lco'],
+    author_email="looker-content-observer@google.com",
     install_requires=[
         "click>=8.0",
         "PyYAML>=5.1",

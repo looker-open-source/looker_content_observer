@@ -37,8 +37,13 @@ def setup(ctx,looker_file):
     logging.info(f"looker.ini file path: {looker_file}")
     instances = add_environment(looker_file=looker_file)
     create_instance_yaml(instances)
-    print("Instances",instances)
-
+    print("Looker Content Observer will be checking for differences between:")
+    output_lambda = lambda instance_str: f"{instance_str[0]} on {instance_str[1]}"
+    if len(instances) > 1:
+        for instance in instances:
+            print(output_lambda(instance))
+    else: 
+        print(output_lambda(instances[0]))
 
 @init_lco.command("cli",
                     help="Skips setup wizard and allows setup via command line args")
