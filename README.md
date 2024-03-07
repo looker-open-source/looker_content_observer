@@ -43,6 +43,12 @@ Run `pip3 list`
 
 ![install_pic](screenshots/fresh_install_pip_list.png)
 
+#### Install Troubleshooting
+Note: Depending on the IDE (VS Code, Sublime, etc...) the method of activating your virtual environment may differ. A common quick troubleshoot item is to make sure the virtual environment is being used when trying to run `lco` commands. 
+
+For example if using VS Code, see (steps around "Select Interpreter")[https://code.visualstudio.com/docs/python/environments#_using-the-create-environment-command], where you will want to make sure the 'lco' interpreter is being used:
+
+![install_pic](screenshots/select_interpretor.png)
 
 ## Demo 
 
