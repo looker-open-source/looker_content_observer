@@ -68,10 +68,10 @@ def add_environment(add_instance:str = 'y',looker_file = "looker.ini") -> list:
         assert env in ['1','2'], f"Please enter a valid number"
 
         if env == '2': 
-            print("Please enter the Looker project assosciated with the dashboard")
+            print("Please enter the Looker project name you are working in")
             proj = input("->Project: ")
 
-            print("Please enter the branch assosciated with the dashboard")
+            print("Please enter the branch you are working in")
             branch = input("->Branch: ")
             proj_branch = proj + "::" + branch
         else:
