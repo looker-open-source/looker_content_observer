@@ -36,7 +36,6 @@ commands = {
 def cli(ctx,logging):
     # Context Obj Docs: https://click.palletsprojects.com/en/8.1.x/complex/#contexts
     ctx.ensure_object(dict)
-    # TODO: What does this mean / do exactly
     ctx.obj['LOGGING'] = logging.upper()
 
 

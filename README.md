@@ -5,7 +5,7 @@
 The Looker Content Observer is NOT officially supported by Looker. Please do not contact Looker support for issues with LCO. Issues may be reported via the [Issues](https://github.com/looker-open-source/looker_content_observer/issues) tracker, but no SLA or warranty exists that they will be resolved. 
 
 ## Description
-This tool is intended to support the automated checking of content in Looker (dashboards and looks), and the queries which underly them. Run it pointed toward a single environment (an environment is an instance+project+branch) and find SQL or LookML errors, results of null or zero, and various formatting details like a count of dashboard filters and tiles. Run it against two environments simultaneously and compare those attritbutes, flagging differences. Use cases include:
+This tool is intended to support the automated checking of content in Looker (dashboards and looks), and the queries which underly them. Run it pointed toward a single environment (an environment is an instance+project+branch) and find SQL or LookML errors, results of null or zero, and various formatting details like a count of dashboard filters and tiles. Run it against two (or more) environments simultaneously and compare those attritbutes, flagging differences. Use cases include:
 - Quality assurance during a data warehouse or Looker instance migration
 - Flagging diffs in content during a Lookml Pull Request process
 
@@ -43,6 +43,12 @@ Run `pip3 list`
 
 ![install_pic](screenshots/fresh_install_pip_list.png)
 
+#### Install Troubleshooting
+Note: Depending on the IDE (VS Code, Sublime, etc...) the method of activating your virtual environment may differ. A common quick troubleshoot item is to make sure the virtual environment is being used when trying to run `lco` commands. 
+
+For example if using VS Code, see (steps around "Select Interpreter")[https://code.visualstudio.com/docs/python/environments#_using-the-create-environment-command], where you will want to make sure the 'lco' interpreter is being used:
+
+![install_pic](screenshots/select_interpretor.png)
 
 ## Demo 
 
