@@ -162,4 +162,4 @@ Bug reports and pull requests are welcome on GitHub at [https://github.com/looke
 
 This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the
 [Contributer Covenant Code of Conduct](https://www.contributor-covenant.org/version/1/4/code-of-conduct). Concerns or
-incidents may be reported confidentially to crutchfielda@google.com.
+incidents may be reported confidentially to looker-content-observer@google.com.
